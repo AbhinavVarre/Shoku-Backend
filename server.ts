@@ -30,5 +30,15 @@ app.get('/api/restaurants', async (req:Request,res:Response) => {
     res.send(result.rows)
 })
 
+app.get('/api/restaurants/best', async (req:Request,res:Response) => {
+    const result = await pool.query('SELECT name, rating FROM restaurant ORDER BY rating DESC;')
+    res.send(result.rows)
+})
+
+app.get('/api/restaurants/mostpopular', async (req:Request,res:Response) => {
+    const result = await pool.query('SELECT MAX(review) FROM restaurant;')
+    res.send(result.rows)
+})
+
 
 app.listen( 5001, '127.0.0.1', () => {console.log("server started")})
