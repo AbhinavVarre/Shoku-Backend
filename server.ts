@@ -14,7 +14,6 @@ const pool = new Pool({
     port     : 5432
 });
 
-//await pool.connect()
 
 
 app.get('/api', (req:Request,res:Response) => {
