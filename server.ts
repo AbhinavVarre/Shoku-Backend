@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { Pool } from 'pg';
 
 //starter server file
+let dotenv = require('dotenv').config()
 const express = require('express')
 const app = express()
 
@@ -40,4 +41,10 @@ app.get('/api/restaurants/mostpopular', async (req:Request,res:Response) => {
 })
 
 
-app.listen( 5001, '127.0.0.1', () => {console.log("server started")})
+if(process.env.NODE_ENV=='local'){
+    app.listen( 5001, '127.0.0.1', () => {console.log("server started")})
+}
+
+else if (process.env.NODE_ENV=='dev'){
+    app.listen( 5001, () => {console.log("server started for dev")})
+}
