@@ -17,11 +17,11 @@ const pool = new Pool({
 
 
 
-app.get('/api', (req:Request,res:Response) => {
+app.get('/api/monkeys', (req:Request,res:Response) => {
     res.json({"monkeys": ['bonobo', 'ape', 'chimpanzee']})
 })
 
-app.get('/', (req:Request,res:Response) => {
+app.get('/api', (req:Request,res:Response) => {
     res.send("Welcome to the shoku backend!!!")
 })
 
