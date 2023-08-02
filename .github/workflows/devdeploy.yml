@@ -1,0 +1,23 @@
+name: deploy-to-dev
+
+on:
+  push:
+    branches: [ develop ]
+    
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on:
+      - self-hosted  
+    steps:
+      - uses: actions/checkout@v2
+      
+      - name: install packages
+        run: |
+          echo runner is running!!!
+        
+    
+  
+  
+
