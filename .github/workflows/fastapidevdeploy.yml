@@ -37,15 +37,11 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-venv-
 
-      # Step-4 Build a Virtual ENV, but only if it doesn't already exist
+      # Step-4 Build a Virtual ENV, and Download packages
       - name: Activate Virtual ENV
-        run: python3 -m venv venv && source venv/bin/activate
+        run: python3 -m venv venv && source venv/bin/activate && pip3 install -r requirements.txt
         if: steps.cache-venv.outputs.cache-hit != 'true'
 
-      #Step-5 Download required packages
-      - name: Download Required Packages
-        run: pip3 install -r requirements.txt
-
-      #Step-6 Restart 
+      #Step-5 Restart the API
       - name: Restart API
         run: pm2 restart api
