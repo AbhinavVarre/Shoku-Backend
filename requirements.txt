@@ -1,5 +1,5 @@
 fastapi
 sqlalchemy 
-psycopg[binary]
+psycopg2-binary
 alembic
 uvicorn
