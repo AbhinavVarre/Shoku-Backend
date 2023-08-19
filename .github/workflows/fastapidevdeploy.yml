@@ -38,7 +38,7 @@ jobs:
             ${{ runner.os }}-venv-
 
       # Step-4 Build a Virtual ENV, and Download packages
-      - name: Activate Virtual ENV
+      - name: Activate Virtual ENV, and Download Packages
         run: python3 -m venv venv && source venv/bin/activate && pip3 install -r requirements.txt
         if: steps.cache-venv.outputs.cache-hit != 'true'
 
