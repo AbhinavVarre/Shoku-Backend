@@ -2,12 +2,16 @@ from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
-#to encode as environment variable
-host     = "shoku-dev.c8iml9o89lxg.us-east-2.rds.amazonaws.com"
-user     = "postgres"
-password = "shokudevdb"
-database = "postgres"
-port     = 5432
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+print(os.getenv('USER'))
+host     = os.getenv('HOST')
+user     = os.getenv('USERNAME')
+password = os.getenv('PASSWORD')
+database = os.getenv('DATABASE')
+port     = os.getenv('PORT')
 
 SQLALCHEMY_DATABASE_URL = f"postgresql://{user}:{password}@{host}:{port}/{database}"
 engine = create_engine(SQLALCHEMY_DATABASE_URL)
