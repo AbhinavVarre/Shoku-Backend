@@ -13,19 +13,12 @@ jobs:
     
     steps:
       - uses: actions/checkout@v2
-      
-      - name: Set up Python
-        # This action sets up a Python environment for use in actions
-        uses: actions/setup-python@v2
-        with:
-          python-version: 3.10.12
-          # optional: architecture: x64 x64 or x86. Defaults to x64 if not specified
 
-      # Step-2 Install Python Virtual ENV
+      # Step-1 Install Python Virtual ENV
       - name: Install Python Virtual ENV
         run: pip3 install virtualenv
 
-      # Step-3 Cache Virtual ENV
+      # Step-2 Cache Virtual ENV
       # https://docs.github.com/en/actions/guides/caching-dependencies-to-speed-up-workflows
       - name:  Virtual ENV
         uses: actions/cache@v2
@@ -37,11 +30,11 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-venv-
 
-      # Step-4 Build a Virtual ENV, and Download packages
+      # Step-3 Build a Virtual ENV, and Download packages
       - name: Activate Virtual ENV, and Download Packages
         run: python3 -m venv venv && source venv/bin/activate && pip3 install -r requirements.txt
         if: steps.cache-venv.outputs.cache-hit != 'true'
 
-      #Step-5 Restart the API
+      #Step-4 Restart the API
       - name: Restart API
         run: pm2 restart api
