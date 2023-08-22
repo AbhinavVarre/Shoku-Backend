@@ -9,6 +9,7 @@ lib-cov
 *.swp
 *.env
 
+venv
 pids
 logs
 results
