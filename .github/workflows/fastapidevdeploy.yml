@@ -14,9 +14,11 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      # Step-1 Install Python Virtual ENV
-      - name: Install Python Virtual ENV
-        run: pip3 install virtualenv
+      # Step-1 Create .env file from repo secrets
+      - name: Create .env File
+        run: |
+          touch .env
+          echo "${{ secrets.DEV_ENV_FILE }}" > .env
 
       # CACHING IS TO BE IMPLEMENTED
       # # https://docs.github.com/en/actions/guides/caching-dependencies-to-speed-up-workflows
