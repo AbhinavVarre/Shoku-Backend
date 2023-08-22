@@ -38,7 +38,7 @@ def read_user(name: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="User not found")
     return db_user
 
-#post a rating from a user
+#post a rating from a user for a restaurant
 @app.post("/users/{user_id}/ratings/", response_model=schemas.Rating)
 def create_rating_for_user(
     user_id: int, item: schemas.RatingCreate, db: Session = Depends(get_db)
@@ -50,3 +50,25 @@ def create_rating_for_user(
 def read_ratings(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     items = crud.get_ratings(db, skip=skip, limit=limit)
     return items
+
+#read ratings by user
+
+#post a review from a user for a restaurant
+
+#read reviews by user
+
+#read reviews by restaurant
+
+#create a restaurant
+
+#read restaurant data by name
+
+#create a list for a user
+
+#add a restaurant to a user's list
+
+#remove a restaurant from a user's list
+
+#read all lists for a user
+
+#read a user's list
