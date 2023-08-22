@@ -39,3 +39,21 @@ class User(UserBase):
     class Config:
         orm_mode = True
 
+
+class ReviewBase(BaseModel):
+    review: str
+    owner_id: int
+
+class ReviewCreate(ReviewBase):
+    pass
+
+class Review(ReviewBase):
+    id: int
+    owner_id: int
+    date: str
+    review: str
+    #pictures: List['Picture'] = []
+
+    class Config:
+        orm_mode = True
+
