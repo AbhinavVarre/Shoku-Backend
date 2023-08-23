@@ -30,27 +30,11 @@ class UserCreate(UserBase):
 class User(UserBase):
     id: int
     ratings: list[Rating] = []
-    #reviews: list['Review'] = []
     #pictures: list['Picture'] = []  
 
     class Config:
         orm_mode = True
 
-
-class ReviewBase(BaseModel):
-    review: str
-    owner_id: int
-
-class ReviewCreate(ReviewBase):
-    pass
-
-class Review(ReviewBase):
-    id: int
-    date: str
-    #pictures: list['Picture'] = []
-
-    class Config:
-        orm_mode = True
 
 class RestaurantBase(BaseModel):
     name: str

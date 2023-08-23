@@ -43,11 +43,11 @@ class Pictures (Base):
     __tablename__ = "pictures"
     id = Column('id', Integer, primary_key = True)
     owner_id = Column('owner_id', Integer, ForeignKey('users.id'))
-    rating_id = Column('rating_id', Integer, ForeignKey('reviews.id'))
+    rating_id = Column('rating_id', Integer, ForeignKey('ratings.id'))
     picture = Column('picture', LargeBinary)
 
     user = relationship('Users', back_populates='pictures')
-    review = relationship('Reviews', back_populates='pictures')
+    review = relationship('Ratings', back_populates='pictures')
 
 class RestaurantLists (Base):
     __tablename__ = "restaurant_lists"
