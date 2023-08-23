@@ -11,7 +11,6 @@ class Users (Base):
     password = Column('password', String)
 
     ratings = relationship('Ratings', back_populates='user')
-    reviews = relationship('Reviews', back_populates='user')
     pictures = relationship('Pictures', back_populates='user')
     lists = relationship('RestaurantLists', back_populates='user')
 

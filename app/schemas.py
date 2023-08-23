@@ -3,7 +3,6 @@ from pydantic import BaseModel
 class RatingBase(BaseModel):
     score: int
     restaurant_id: int
-    owner_id: int
 
 class RatingCreate(RatingBase):
     pass

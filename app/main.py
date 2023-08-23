@@ -29,30 +29,43 @@ def read_users(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     return users
 
 #read user data by name
-@app.get("/users/{name}", response_model=schemas.User)
-def read_user(name: int, db: Session = Depends(get_db)):
+@app.get("/users/name/{name}", response_model=schemas.User)
+def read_user(name: str, db: Session = Depends(get_db)):
     db_user = crud.get_user(db, name=name)
     if db_user is None:
         raise HTTPException(status_code=404, detail="User not found")
     return db_user
 
+#read user data by id
+@app.get("/users/id/{user_id}", response_model=schemas.User)
+def read_user_by_id(user_id: int, db: Session = Depends(get_db)):
+    db_user = crud.get_user_by_id(db, id=user_id)
+    if db_user is None:
+        raise HTTPException(status_code=404, detail="User not found")
+    return db_user
+
 #post a rating from a user for a restaurant
-@app.post("/users/{user_id}/ratings/", response_model=schemas.Rating)
+@app.post("/users/{owner_name}/ratings/new", response_model=schemas.Rating)
 def create_rating_for_user(
-    user_id: int, item: schemas.RatingCreate, db: Session = Depends(get_db)
+    item: schemas.RatingCreate, owner_name : str, db: Session = Depends(get_db)
 ):
-    return crud.create_user_rating(db=db, item=item, user_id=user_id)
+    return crud.create_user_rating(db=db, rating=item, owner_name=owner_name)
 
 #read ratings by restaurant
-@app.get("/restaurant/{restaurant}/ratings/", response_model=list[schemas.Rating])
-def read_ratings(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
-    items = crud.get_ratings(db, skip=skip, limit=limit)
+@app.get("/restaurant/{restaurant_id}/ratings/", response_model=list[schemas.Rating])
+def read_ratings(restaurant_id: int, db: Session = Depends(get_db)):
+    items = crud.get_ratings(db, restaurant_id=restaurant_id)
     return items
 
 #read ratings by user
+@app.get("/users/{user_id}/ratings/", response_model=list[schemas.Rating])
+def read_user_ratings(user_id: int, db: Session = Depends(get_db)):
+    db_user = crud.get_user_by_id(db, id=user_id)
+    if db_user is None:
+        raise HTTPException(status_code=404, detail="User not found")
+    return db_user.ratings
 
 #create a restaurant
-
 
 #read restaurant data by name
 

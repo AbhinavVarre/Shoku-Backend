@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 host     = os.getenv('HOST')
-user     = os.getenv('USER')
+user     = os.getenv('DBUSER')
 password = os.getenv('PASSWORD')
 database = os.getenv('DATABASE')
 port     = os.getenv('PORT')
