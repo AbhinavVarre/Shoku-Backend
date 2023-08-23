@@ -51,19 +51,12 @@ def read_ratings(skip: int = 0, limit: int = 100, db: Session = Depends(get_db))
 
 #read ratings by user
 
-#post a review from a user for a restaurant
-
-#read reviews by user
-
-#read reviews by restaurant
-
 #create a restaurant
+
 
 #read restaurant data by name
 
 #read ratings by restaurant
-
-#read reviews by restaurant
 
 #create a list for a user
 

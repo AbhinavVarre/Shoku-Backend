@@ -22,18 +22,10 @@ class Ratings (Base):
     restaurant_id = Column('restaurant_id', Integer, ForeignKey('restaurants.id'))
     date = Column('date', Date)
     score = Column('score', Integer)
+    review = Column('review', String)
 
     user = relationship('Users', back_populates='ratings')
     restaurant = relationship('Restaurants', back_populates='ratings')
-
-class Reviews (Base):
-    __tablename__ = "reviews"
-    id = Column('id', Integer, primary_key = True)
-    owner_id = Column('owner_id', Integer, ForeignKey('users.id'))
-    date = Column('date', Date)
-    review = Column('review', String)
-    
-    user = relationship('Users', back_populates='reviews')
     pictures = relationship('Pictures', back_populates='review')
 
 class Restaurants (Base):
