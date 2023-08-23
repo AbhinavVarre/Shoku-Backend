@@ -39,6 +39,7 @@ class Reviews (Base):
 class Restaurants (Base):
     __tablename__ = "restaurants"
     id = Column('id', Integer, primary_key = True)
+    name = Column('name', String)
     totalscore = Column('totalscore', Integer)
     numratings = Column('numRatings', Integer)
     list_id = Column('list_id', Integer, ForeignKey('restaurant_lists.id'))

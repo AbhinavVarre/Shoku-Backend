@@ -1,5 +1,3 @@
-from typing import List
-
 from pydantic import BaseModel
 
 class RatingBase(BaseModel):
@@ -31,9 +29,9 @@ class UserCreate(UserBase):
 
 class User(UserBase):
     id: int
-    ratings: List[Rating] = []
-    #reviews: List['Review'] = []
-    #pictures: List['Picture'] = []  
+    ratings: list[Rating] = []
+    #reviews: list['Review'] = []
+    #pictures: list['Picture'] = []  
 
     class Config:
         orm_mode = True
@@ -49,7 +47,7 @@ class ReviewCreate(ReviewBase):
 class Review(ReviewBase):
     id: int
     date: str
-    #pictures: List['Picture'] = []
+    #pictures: list['Picture'] = []
 
     class Config:
         orm_mode = True
@@ -65,7 +63,7 @@ class Restaurant(RestaurantBase):
     totalscore: int
     numratings: int
     list_id: int
-    ratings: List[Rating] = []
+    ratings: list[Rating] = []
 
     class Config:
         orm_mode = True
@@ -94,7 +92,7 @@ class RestaurantListCreate(RestaurantListBase):
 
 class RestaurantList(RestaurantListBase):
     id: int
-    restaurants: List[Restaurant] = []
+    restaurants: list[Restaurant] = []
 
     class Config:
         orm_mode = True
