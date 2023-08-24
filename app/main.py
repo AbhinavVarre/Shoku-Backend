@@ -68,6 +68,12 @@ def read_user_ratings(user_id: int, db: Session = Depends(get_db)):
 def create_restaurant(restaurant: schemas.RestaurantCreate, db: Session = Depends(get_db)):
     return crud.create_restaurant(db=db, restaurant=restaurant)
 
+#read all restaurants
+@app.get("/restaurants/", response_model=list[schemas.Restaurant])
+def read_restaurants(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+    users = crud.get_restaurants(db, skip=skip, limit=limit)
+    return users
+
 #read restaurant data by name
 @app.get("/restaurants/name/{name}", response_model=schemas.Restaurant)
 def read_restaurant(name: str, db: Session = Depends(get_db)):
@@ -80,9 +86,18 @@ def read_restaurant_by_id(id: int, db: Session = Depends(get_db)):
     db_restaurant = crud.read_restaurant_by_id(db, id=id)
     return db_restaurant
 
-#read ratings by restaurant
+#read ratings by restaurant name
+@app.get("/restaurants/ratings/name/{name}", response_model=list[schemas.Rating])
+def read_restaurant_ratings(name: str, db: Session = Depends(get_db)):
+    ratings = crud.read_restaurant_ratings(db, name=name)
+    return ratings
+
 
 #get restaurant average rating
+@app.get("/restaurants/{name}/score", response_model=float)
+def read_restaurant_avg_score(name: str, db: Session = Depends(get_db)):
+    score = crud.get_average_rating(db, name=name)
+    return score
 
 #create a list for a user
 

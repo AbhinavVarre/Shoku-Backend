@@ -45,8 +45,6 @@ class RestaurantCreate(RestaurantBase):
 
 class Restaurant(RestaurantBase):
     id: int
-    totalscore: int
-    numratings: int
     #list_id: int
     ratings: list[Rating] = []
 
@@ -58,7 +56,7 @@ class PictureBase(BaseModel):
 
 class PictureCreate(PictureBase):
     pass
-
+ 
 class Picture(PictureBase):
     id: int
     owner_id: int
