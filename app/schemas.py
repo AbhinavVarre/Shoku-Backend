@@ -14,7 +14,7 @@ class Rating(RatingBase):
     restaurant_id: int
     score: int
     review: str | None = None
-    date: str
+    created_at: str
 
     class Config:
         orm_mode = True

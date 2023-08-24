@@ -19,7 +19,7 @@ class Ratings (Base):
     id = Column('id', Integer, primary_key = True)
     owner_id = Column('owner_id', Integer, ForeignKey('users.id'))
     restaurant_id = Column('restaurant_id', Integer, ForeignKey('restaurants.id'))
-    date = Column('date', Date)
+    created_at = Column('created_at', String)
     score = Column('score', Integer)
     review = Column('review', String)
 
@@ -50,11 +50,11 @@ class Restaurants (Base):
     id = Column('id', Integer, primary_key = True)
     name = Column('name', String)
     totalscore = Column('totalscore', Integer)
-    numratings = Column('numRatings', Integer)
+    numratings = Column('numratings', Integer)
     #list_id = Column('list_id', Integer, ForeignKey('restaurant_lists.id'))
 
     ratings = relationship('Ratings', back_populates='restaurant')
-    lists = relationship(
+    lists = relationship( 
         'RestaurantLists',
         secondary=restaurant_association,
         back_populates='restaurants'

@@ -31,12 +31,14 @@ def get_user_by_id(db: Session, id: int) -> models.Users:
     return user
 
 #post a rating from a user for a restaurant
-def create_user_rating(db: Session, rating: schemas.RatingCreate, owner_name : str):
-    current_date = datetime.datetime.now()
+def create_user_rating(db: Session, rating: schemas.RatingCreate, owner_name: str):
+    current_date = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S.%f')
+    dict = rating.model_dump()
     owner = get_user(db, name=owner_name)
-    if owner is None:
-        raise HTTPException(status_code=404, detail="User not found")
-    db_item = models.Ratings(**rating.model_dump(), owner_id=owner.id, date=current_date)
+    restaurant = read_restaurant_by_id(db, id=dict['restaurant_id'])
+    restaurant.totalscore += dict['score']
+    restaurant.numratings += 1 # type: ignore
+    db_item = models.Ratings(**rating.model_dump(), owner_id=owner.id, created_at=current_date)
     db.add(db_item)
     db.commit()
     db.refresh(db_item)
@@ -48,7 +50,7 @@ def get_ratings(db: Session, restaurant_id: int):
 
 
 #read ratings by user
-def read_user_ratings(db: Session, owner_id: int, name: str):
+def read_user_ratings(db: Session, name: str):
     return get_user(db, name=name).ratings
 
 #create a restaurant

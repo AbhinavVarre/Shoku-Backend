@@ -46,9 +46,7 @@ def read_user_by_id(user_id: int, db: Session = Depends(get_db)):
 
 #post a rating from a user for a restaurant
 @app.post("/users/{owner_name}/ratings/new", response_model=schemas.Rating)
-def create_rating_for_user(
-    item: schemas.RatingCreate, owner_name: str, db: Session = Depends(get_db)
-):
+def create_rating_for_user(item: schemas.RatingCreate, owner_name: str, db: Session = Depends(get_db)):
     return crud.create_user_rating(db=db, rating=item, owner_name=owner_name)
 
 #read ratings by restaurant
