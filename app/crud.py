@@ -12,18 +12,23 @@ def create_user(db: Session, user: schemas.UserCreate):
     db.refresh(db_user)
     return db_user
 
-
 #read all users
 def get_users(db: Session, skip: int = 0, limit: int = 100):
     return db.query(models.Users).offset(skip).limit(limit).all()
 
 #read user data by name
 def get_user(db: Session, name: str) -> models.Users:
-    return db.query(models.Users).filter(models.Users.name == name).first()
+    user = db.query(models.Users).filter(models.Users.name == name).first()
+    if user is None:
+        raise HTTPException(status_code=404, detail="User not found")
+    return user
 
 #read user data by id
 def get_user_by_id(db: Session, id: int) -> models.Users:
-    return db.query(models.Users).filter(models.Users.id == id).first()
+    user = db.query(models.Users).filter(models.Users.id == id).first()
+    if user is None:
+        raise HTTPException(status_code=404, detail="User not found")
+    return user
 
 #post a rating from a user for a restaurant
 def create_user_rating(db: Session, rating: schemas.RatingCreate, owner_name : str):
@@ -47,12 +52,26 @@ def read_user_ratings(db: Session, owner_id: int, name: str):
     return get_user(db, name=name).ratings
 
 #create a restaurant
-def create_restaurant():
-    pass
+def create_restaurant(db: Session, restaurant: schemas.RestaurantCreate):
+    db_restaurant = models.Restaurants(**restaurant.model_dump(), totalscore=0, numratings=0)
+    db.add(db_restaurant)
+    db.commit()
+    db.refresh(db_restaurant)
+    return db_restaurant
 
 #read restaurant data by name
-def read_restaurant():
-    pass
+def read_restaurant(db: Session, name: str):
+    restaurant = db.query(models.Restaurants).filter(models.Restaurants.name == name).first()
+    if restaurant is None:
+        raise HTTPException(status_code=404, detail="Restaurant not found")
+    return restaurant
+
+#read restaurant data by name
+def read_restaurant_by_id(db: Session, id: int):
+    restaurant = db.query(models.Restaurants).filter(models.Restaurants.id == id).first()
+    if restaurant is None:
+        raise HTTPException(status_code=404, detail="Restaurant not found")
+    return restaurant
 
 #read ratings by restaurant
 def read_restaurant_ratings():

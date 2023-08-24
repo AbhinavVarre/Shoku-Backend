@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, BigInteger, String, ForeignKey, Unicode, LargeBinary, Time, DateTime, Date, Text, Boolean, Float, JSON
+from sqlalchemy import Table, Column, Integer, BigInteger, String, ForeignKey, Unicode, LargeBinary, Time, DateTime, Date, Text, Boolean, Float, JSON
 from sqlalchemy.orm import relationship, backref, deferred
 from .database import Base
 
@@ -27,17 +27,6 @@ class Ratings (Base):
     restaurant = relationship('Restaurants', back_populates='ratings')
     pictures = relationship('Pictures', back_populates='review')
 
-class Restaurants (Base):
-    __tablename__ = "restaurants"
-    id = Column('id', Integer, primary_key = True)
-    name = Column('name', String)
-    totalscore = Column('totalscore', Integer)
-    numratings = Column('numRatings', Integer)
-    list_id = Column('list_id', Integer, ForeignKey('restaurant_lists.id'))
-
-    ratings = relationship('Ratings', back_populates='restaurant')
-    restaurant_list = relationship('RestaurantLists', back_populates='restaurants')
-
 class Pictures (Base):
     __tablename__ = "pictures"
     id = Column('id', Integer, primary_key = True)
@@ -48,6 +37,29 @@ class Pictures (Base):
     user = relationship('Users', back_populates='pictures')
     review = relationship('Ratings', back_populates='pictures')
 
+# Many to many relationship between restaurants and restaurant lists
+restaurant_association = Table(
+    'restaurant_list_association',
+    Base.metadata,
+    Column('restaurant_id', Integer, ForeignKey('restaurants.id')),
+    Column('restaurant_list_id', Integer, ForeignKey('restaurant_lists.id'))
+)
+
+class Restaurants (Base):
+    __tablename__ = "restaurants"
+    id = Column('id', Integer, primary_key = True)
+    name = Column('name', String)
+    totalscore = Column('totalscore', Integer)
+    numratings = Column('numRatings', Integer)
+    #list_id = Column('list_id', Integer, ForeignKey('restaurant_lists.id'))
+
+    ratings = relationship('Ratings', back_populates='restaurant')
+    lists = relationship(
+        'RestaurantLists',
+        secondary=restaurant_association,
+        back_populates='restaurants'
+    )
+
 class RestaurantLists (Base):
     __tablename__ = "restaurant_lists"
     id = Column('id', Integer, primary_key = True)
@@ -56,5 +68,9 @@ class RestaurantLists (Base):
     description = Column('description', String)
 
     user = relationship('Users', back_populates='lists')
-    restaurants = relationship('Restaurants', back_populates='restaurant_list')
+    restaurants = relationship(
+        'Restaurants', 
+        secondary=restaurant_association,
+        back_populates='lists'
+    )
 
