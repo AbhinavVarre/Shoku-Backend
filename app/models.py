@@ -41,8 +41,8 @@ class Pictures (Base):
 restaurant_association = Table(
     'restaurant_list_association',
     Base.metadata,
-    Column('restaurant_id', Integer, ForeignKey('restaurants.id')),
-    Column('restaurant_list_id', Integer, ForeignKey('restaurant_lists.id'))
+    Column('restaurant_id', Integer, ForeignKey('restaurants.id'), primary_key=True),
+    Column('restaurant_list_id', Integer, ForeignKey('restaurant_lists.id'), primary_key=True)
 )
 
 class Restaurants (Base):

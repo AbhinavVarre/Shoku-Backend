@@ -100,11 +100,21 @@ def read_restaurant_avg_score(name: str, db: Session = Depends(get_db)):
     return score
 
 #create a list for a user
+@app.post("/restaurantlist/{owner_name}/add", response_model=schemas.RestaurantList)
+def create_list(list: schemas.RestaurantListCreate, owner_name: str, db: Session = Depends(get_db)):
+    return crud.create_list(db=db, list=list, owner_name=owner_name)
 
 #add a restaurant to a user's list
-
-#remove a restaurant from a user's list
+@app.post("/restaurantlist/{owner_name}/{list_name}/add/{restaurant_name}", response_model=schemas.RestaurantList)
+def add_to_list(owner_name: str, list_name: str, restaurant_name:str, db: Session = Depends(get_db)):
+    return crud.add_restaurant_to_list(db=db, owner_name=owner_name, list_name = list_name, restaurant_name=restaurant_name)
 
 #read all lists for a user
+@app.get("/restaurantlist/{owner_name}/all", response_model=list[schemas.RestaurantList])
+def read_all_lists(owner_name: str, db: Session = Depends(get_db)):
+    return crud.read_lists(db=db, owner_name=owner_name)
 
 #read a user's list
+@app.get("/restaurantlist/{owner_name}/{list_name}", response_model=schemas.RestaurantList)
+def read_list(owner_name: str, list_name: str, db: Session = Depends(get_db)):
+    return crud.read_list(db=db, owner_name=owner_name, name=list_name)

@@ -20,23 +20,6 @@ class Rating(RatingBase):
         orm_mode = True
 
 
-class UserBase(BaseModel):
-    name: str
-    password: str
-
-class UserCreate(UserBase):
-    pass
-
-
-class User(UserBase):
-    id: int
-    ratings: list[Rating] = []
-    #pictures: list['Picture'] = []  
-
-    class Config:
-        orm_mode = True
-
-
 class RestaurantBase(BaseModel):
     name: str
 
@@ -66,7 +49,6 @@ class Picture(PictureBase):
         orm_mode = True
 
 class RestaurantListBase(BaseModel):
-    owner_id: int
     name: str
     description: str
 
@@ -76,6 +58,23 @@ class RestaurantListCreate(RestaurantListBase):
 class RestaurantList(RestaurantListBase):
     id: int
     restaurants: list[Restaurant] = []
+
+    class Config:
+        orm_mode = True
+
+class UserBase(BaseModel):
+    name: str
+    password: str
+
+class UserCreate(UserBase):
+    pass
+
+
+class User(UserBase):
+    id: int
+    ratings: list[Rating] = []
+    lists: list[RestaurantList] = []
+    #pictures: list['Picture'] = []  
 
     class Config:
         orm_mode = True
