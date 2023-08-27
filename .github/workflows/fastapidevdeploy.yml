@@ -34,7 +34,7 @@ jobs:
 
       # Step-2 Build a Virtual ENV, and Download packages
       - name: Activate Virtual ENV, and Download Packages
-        run: python3 -m venv venv && source venv/bin/activate && pip3 install -r requirements.txt
+        run: python3 -m pipenv shell && python3 -m pipenv install
         # if: steps.cache-venv.outputs.cache-hit != 'true'
 
       #Step-3 Restart the API
