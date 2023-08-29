@@ -36,6 +36,10 @@ jobs:
       - name: Download packages
         run: python3 -m pipenv install --deploy
 
-      #Step-3 Restart the API
+      # Step 3 Run tests
+      #- name: Run tests
+      #  run: python3 -m pipenv run pytest
+
+      # Step 4 Restart the API
       - name: Restart API
         run: pm2 restart api
