@@ -29,7 +29,6 @@ app = FastAPI(openapi_tags=tags_metadata)
 
 #add users
 @app.post("/users/add", response_model=schemas.User, tags=["users"], summary="Add a user")
-
 def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
     return crud.create_user(db=db, user=user)
 
@@ -58,6 +57,9 @@ def read_user_by_id(user_id: int, db: Session = Depends(get_db)):
 #post a rating from a user for a restaurant
 @app.post("/users/{owner_name}/ratings/new", response_model=schemas.Rating, tags=["ratings"], summary="Post a rating from a user for a restaurant")
 def create_rating_for_user(item: schemas.RatingCreate, owner_name: str, db: Session = Depends(get_db)):
+    """
+    Create a rating for a restaurant, from a specified user.
+    """
     return crud.create_user_rating(db=db, rating=item, owner_name=owner_name)
 
 #read ratings by restaurant
