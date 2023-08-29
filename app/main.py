@@ -71,6 +71,9 @@ def read_ratings(restaurant_id: int, db: Session = Depends(get_db)):
 #read ratings by user
 @app.get("/users/{user_id}/ratings/", response_model=list[schemas.Rating], tags=["ratings"], summary="Read ratings by user")
 def read_user_ratings(user_id: int, db: Session = Depends(get_db)):
+    """
+    Returns the average rating for a restaurant. If there are no raings, returns 0.
+    """
     db_user = crud.get_user_by_id(db, id=user_id)
     if db_user is None:
         raise HTTPException(status_code=404, detail="User not found")
