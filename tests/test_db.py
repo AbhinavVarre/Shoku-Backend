@@ -1,5 +1,6 @@
 from fastapi.testclient import TestClient
 from app.main import app
+from app import schemas
 
 
 client = TestClient(app)
