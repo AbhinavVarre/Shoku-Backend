@@ -35,7 +35,7 @@ app.include_router(restaurants.router)
 app.include_router(ratings.router)
 app.include_router(lists.router)
 
-#to be specified later
+#CORS
 origins = ["*"]
 
 app.add_middleware(
