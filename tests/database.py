@@ -6,6 +6,8 @@ from sqlalchemy.pool import StaticPool
 
 from app.database import Base
 from app.main import app, get_db
+from alembic import command
+from alembic.config import Config
 
 import os
 from dotenv import load_dotenv
@@ -23,12 +25,13 @@ SQLALCHEMY_DATABASE_URL = f"postgresql://{user}:{password}@{host}:{port}/{databa
 engine = create_engine(SQLALCHEMY_DATABASE_URL)
 TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
-
+alembic_cfg = Config("alembic.ini")
 
 @pytest.fixture()
 def session():
-    Base.metadata.drop_all(bind=engine)
+    command.upgrade(alembic_cfg, "head")
     Base.metadata.create_all(bind=engine)
+    command.downgrade(alembic_cfg, "base")
     db = None
     try:
         db = TestingSessionLocal()
