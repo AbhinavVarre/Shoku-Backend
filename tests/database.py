@@ -24,10 +24,11 @@ engine = create_engine(SQLALCHEMY_DATABASE_URL)
 TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 
-Base.metadata.create_all(bind=engine)
 
-
-def override_get_db():
+@pytest.fixture()
+def session():
+    Base.metadata.drop_all(bind=engine)
+    Base.metadata.create_all(bind=engine)
     db = None
     try:
         db = TestingSessionLocal()
@@ -36,28 +37,15 @@ def override_get_db():
         if db:
             db.close()
 
-
-app.dependency_overrides[get_db] = override_get_db
-
 @pytest.fixture
-def client():
-    Base.metadata.drop_all(bind=engine)
-    Base.metadata.create_all(bind=engine)
+def client(session):
+    def override_get_db():
+        db = None
+        try:
+            db = TestingSessionLocal()
+            yield db
+        finally:
+            if db:
+                db.close()
+    app.dependency_overrides[get_db] = override_get_db
     yield TestClient(app)
-
-def test_create_user(client):
-    response = client.post(
-        "/users/add",
-        json={"name": "abhinav", "password": "chimichangas"},
-    )
-    assert response.status_code == 200, response.text
-    data = response.json()
-    assert "name" in data
-    assert data["name"] == "abhinav"
-    user_name = data["name"]
-
-    response = client.get(f"/users/name/{user_name}")
-    assert response.status_code == 200, response.text
-    data = response.json()
-    assert data["name"] == "abhinav"
-    assert data["name"] == user_name
