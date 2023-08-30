@@ -9,6 +9,7 @@ lib-cov
 *.swp
 *.env
 
+venv
 pids
 logs
 results
@@ -38,5 +39,5 @@ Thumbs.db
 # Ignore built ts files
 dist/**/*
 
-# ignore yarn.lock
-yarn.lock
+# ignore pycache files
+**/__pycache__
