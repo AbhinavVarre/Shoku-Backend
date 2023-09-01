@@ -1,7 +1,10 @@
-from fastapi import Depends, FastAPI, HTTPException, APIRouter
-from app import schemas, models, crud, oauth2
+from fastapi import Depends, FastAPI, HTTPException, APIRouter, UploadFile, File, Form
+from app import schemas, models, crud, oauth2, utils
 from app.database import get_db
 from sqlalchemy.orm import Session
+from typing import Annotated, Tuple
+from pydantic import ValidationError
+import json
 
 router = APIRouter(
     prefix="/ratings",
@@ -10,13 +13,22 @@ router = APIRouter(
 
 
 #post a rating from a user for a restaurant
-@router.post("/new", response_model=schemas.Rating, summary="Post a rating from a user for a restaurant")
-def create_rating_for_user(item: schemas.RatingCreate, owner_name: str, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
-    """
-    Create a rating for a restaurant, from a specified user.
-    """
-    name = crud.get_user_by_id(db, id=current_user).name
-    return crud.create_user_rating(db=db, rating=item, owner_name=name) # type: ignore
+@router.post("/new", response_model=schemas.Rating, summary="Post a rating from a user for a restaurant", description="input a json containing the following fields: score, restaurant_id, and optionally a review")
+def create_rating_for_user(
+    item_json: str = Form(...),  # Expect the data as a stringified JSON,
+    db: Session = Depends(get_db),
+    current_user: str = Depends(oauth2.get_current_user),
+    picture: UploadFile = File(None) 
+):
+    try:
+        # Convert the stringified JSON to a dict
+        item_data = json.loads(item_json)
+        # Convert the dict to the desired Pydantic model
+        item = schemas.RatingCreate(**item_data)
+    except (json.JSONDecodeError, ValidationError):
+        raise HTTPException(status_code=400, detail="Invalid item data")
+    
+    return crud.create_user_rating(db=db, rating=item, owner_name=current_user, picture=picture)
 
 #read ratings by restaurant
 @router.get("/{restaurant_id}/read", response_model=list[schemas.Rating], summary="Read ratings by restaurant")

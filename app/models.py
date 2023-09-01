@@ -22,6 +22,7 @@ class Ratings (Base):
     created_at = Column('created_at', String)
     score = Column('score', Integer)
     review = Column('review', String)
+    pictureUrl = Column('pictureURL', String)
 
     user = relationship('Users', back_populates='ratings')
     restaurant = relationship('Restaurants', back_populates='ratings')
