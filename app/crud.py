@@ -1,11 +1,13 @@
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
-from . import models, schemas
+from . import models, schemas, utils
 import datetime
 
 
 # add users
 def create_user(db: Session, user: schemas.UserCreate):
+    hashed_password = utils.hash(user.password)
+    user.password = hashed_password
     db_user = models.Users(**user.model_dump())
     db.add(db_user)
     db.commit()
@@ -37,7 +39,6 @@ def get_user_by_id(db: Session, id: int) -> models.Users:
 # post a rating from a user for a restaurant
 def create_user_rating(db: Session, rating: schemas.RatingCreate, owner_name: str):
     current_date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")
-    dict = rating.model_dump()
     owner = get_user(db, name=owner_name)
     db_item = models.Ratings(
         **rating.model_dump(), owner_id=owner.id, created_at=current_date

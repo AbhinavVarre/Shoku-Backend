@@ -1,5 +1,5 @@
 from fastapi import Depends, FastAPI, HTTPException, APIRouter
-from app import schemas, models, crud
+from app import schemas, models, crud, oauth2
 from app.database import get_db
 from sqlalchemy.orm import Session
 
@@ -10,12 +10,13 @@ router = APIRouter(
 
 
 #post a rating from a user for a restaurant
-@router.post("/{owner_name}/new", response_model=schemas.Rating, summary="Post a rating from a user for a restaurant")
-def create_rating_for_user(item: schemas.RatingCreate, owner_name: str, db: Session = Depends(get_db)):
+@router.post("/new", response_model=schemas.Rating, summary="Post a rating from a user for a restaurant")
+def create_rating_for_user(item: schemas.RatingCreate, owner_name: str, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
     """
     Create a rating for a restaurant, from a specified user.
     """
-    return crud.create_user_rating(db=db, rating=item, owner_name=owner_name)
+    name = crud.get_user_by_id(db, id=current_user).name
+    return crud.create_user_rating(db=db, rating=item, owner_name=name) # type: ignore
 
 #read ratings by restaurant
 @router.get("/{restaurant_id}/read", response_model=list[schemas.Rating], summary="Read ratings by restaurant")

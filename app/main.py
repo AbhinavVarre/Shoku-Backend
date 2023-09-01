@@ -4,14 +4,18 @@ from sqlalchemy.orm import Session
 
 from . import crud, models, schemas
 from .database import get_db
-from .routers import users, restaurants, ratings, lists
+from .routers import auth, users, restaurants, ratings, lists
 
 #models.Base.metadata.create_all(bind=engine)
 
 tags_metadata = [
     {
+        "name": "Authentication",
+        "description": "Login function",
+    },
+    {
         "name": "users",
-        "description": "Operations with users.",
+        "description": "Operations with users",
     },
     {
         "name": "ratings",
@@ -30,10 +34,12 @@ tags_metadata = [
 app = FastAPI(openapi_tags=tags_metadata)
 
 #including routers
+app.include_router(auth.router)
 app.include_router(users.router)
 app.include_router(restaurants.router)
 app.include_router(ratings.router)
 app.include_router(lists.router)
+
 
 #CORS
 origins = ["*"]

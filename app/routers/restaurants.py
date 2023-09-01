@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 
 router = APIRouter(
     prefix="/restaurants",
-    tags=["restaurants"],
+    tags=["restaurants"]
 )
 
 
