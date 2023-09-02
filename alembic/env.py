@@ -20,8 +20,8 @@ config = context.config
 
 
 #set up database connection
-
-config.set_main_option("sqlalchemy.url", SQLALCHEMY_DATABASE_URL)
+SQLALCHEMY_TEST_URL = SQLALCHEMY_DATABASE_URL+"_test"
+config.set_main_option("sqlalchemy.url", SQLALCHEMY_TEST_URL)
 
 # Interpret the config file for Python logging.
 # This line sets up loggers basically.

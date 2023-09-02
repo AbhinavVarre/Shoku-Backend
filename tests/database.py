@@ -20,18 +20,19 @@ password = os.getenv('PASSWORD')
 database = os.getenv('DATABASE')
 port     = os.getenv('PORT')
 
-SQLALCHEMY_DATABASE_URL = f"postgresql://{user}:{password}@{host}:{port}/{database}_test"
+SQLALCHEMY_TEST_URL = f"postgresql://{user}:{password}@{host}:{port}/{database}_test"
 
-engine = create_engine(SQLALCHEMY_DATABASE_URL)
+engine = create_engine(SQLALCHEMY_TEST_URL)
 TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 alembic_cfg = Config("alembic.ini")
 
 @pytest.fixture()
 def session():
-    command.upgrade(alembic_cfg, "head")
-    Base.metadata.create_all(bind=engine)
+    #Base.metadata.drop_all(bind=engine)
+    #Base.metadata.create_all(bind=engine)
     command.downgrade(alembic_cfg, "base")
+    command.upgrade(alembic_cfg, "head")
     db = None
     try:
         db = TestingSessionLocal()
