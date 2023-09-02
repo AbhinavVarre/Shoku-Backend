@@ -19,6 +19,7 @@ python-multipart = "*"
 python-jose = {extras = ["cryptography"], version = "*"}
 passlib = {extras = ["bcrypt"], version = "*"}
 boto3 = "*"
+exceptiongroup = "*"
 
 [dev-packages]
 pytest = ">=7.4.0"
