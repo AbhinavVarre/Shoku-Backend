@@ -3,6 +3,7 @@ from fastapi import UploadFile
 import boto3
 import os
 from dotenv import load_dotenv
+from urllib.parse import quote
 
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -28,16 +29,8 @@ def upload_file_to_s3 (file: UploadFile):
         aws_access_key_id=S3_ACCESS_KEY,
         aws_secret_access_key=S3_SECRET_KEY
     )
-
     s3_client.upload_fileobj(file.file, S3_BUCKET_NAME, file.filename)
-
-    #url = s3_client.generate_presigned_url(
-    #    ClientMethod='get_object',
-    #    Params={ 
-    #        'Bucket': S3_BUCKET_NAME,
-    #        'Key': file.filename
-    #    }
-    #)
-    url = f"https://{S3_BUCKET_NAME}.s3.{S3_REGION}.amazonaws.com/{file.filename}"
+    file_key = quote(file.filename, safe='') # type: ignore
+    url = f"https://{S3_BUCKET_NAME}.s3.{S3_REGION}.amazonaws.com/{file_key}"
     return url
 
