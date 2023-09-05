@@ -20,6 +20,7 @@ python-jose = {extras = ["cryptography"], version = "*"}
 passlib = {extras = ["bcrypt"], version = "*"}
 boto3 = "*"
 exceptiongroup = "*"
+python-magic = "*"
 
 [dev-packages]
 pytest = ">=7.4.0"

@@ -1,13 +1,15 @@
 from passlib.context import CryptContext
-from fastapi import UploadFile
+from fastapi import UploadFile, HTTPException,status
 import boto3
 import os
 from dotenv import load_dotenv
 from urllib.parse import quote
-
+import magic
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-
+allowed_mimes = {'image/png', 
+                 'image/jpeg', 
+                 'image/gif'}
 
 def hash(password: str):
     return pwd_context.hash(password)
@@ -22,8 +24,23 @@ S3_ACCESS_KEY = os.getenv("S3_ACCESS_KEY")
 S3_SECRET_KEY = os.getenv("S3_SECRET_KEY")
 S3_REGION = os.getenv("S3_REGION")
 
-def upload_file_to_s3 (file: UploadFile):
-    
+async def upload_file_to_s3 (file: UploadFile):
+
+    #check file size
+    contents = await file.read()
+    size = len(contents)
+    MB = 1024**2
+    if not 0 <size<=5*MB:
+        raise HTTPException (status_code=status.HTTP_400_BAD_REQUEST, detail="File size must be between 1 and 5 MB")
+
+    #check file MIME type
+    mime = magic.Magic(mime=True)
+    file_mime_type = mime.from_buffer(file.file.read(1024))  # Read only the first 1024 bytes to determine MIME type
+    file.file.seek(0)  # Reset file pointer
+    if file_mime_type not in allowed_mimes:
+         raise HTTPException (status_code=status.HTTP_400_BAD_REQUEST, detail=f'Unsupported file type: {file_mime_type}. Supprted types are: {allowed_mimes}')
+
+    #upload file to S3
     s3_client = boto3.client(
         's3',
         aws_access_key_id=S3_ACCESS_KEY,
