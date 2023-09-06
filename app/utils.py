@@ -30,6 +30,7 @@ async def upload_file_to_s3 (file: UploadFile):
     MB = 1024**2
     if not 0 <size<=5*MB:
         raise HTTPException (status_code=status.HTTP_400_BAD_REQUEST, detail="File size must be between 1 and 5 MB")
+    await file.seek(0)
 
     #check file MIME type
     file_mime_type = file.content_type
