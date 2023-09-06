@@ -37,12 +37,12 @@ def get_user_by_id(db: Session, id: int) -> models.Users:
 
 
 # post a rating from a user for a restaurant
-def create_user_rating(db: Session, rating: schemas.RatingCreate, owner_name: str, picture: UploadFile | None = None):
+async def create_user_rating(db: Session, rating: schemas.RatingCreate, owner_name: str, picture: UploadFile | None = None):
     current_date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")
     owner = get_user(db, name=owner_name)
     pictureUrl = None
     if picture:
-        pictureUrl = utils.upload_file_to_s3(picture)
+        pictureUrl = await utils.upload_file_to_s3(picture)
     db_item = models.Ratings(
         **rating.model_dump(), owner_id=owner.id, created_at=current_date, pictureUrl=pictureUrl
     )

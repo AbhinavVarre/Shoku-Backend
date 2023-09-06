@@ -14,7 +14,7 @@ router = APIRouter(
 
 #post a rating from a user for a restaurant
 @router.post("/new", response_model=schemas.Rating, summary="Post a rating from a user for a restaurant", description="input a json containing the following fields: score, restaurant_id, and optionally a review like {\"score\": 0, \"restaurant_id\": 1, \"review\": \"pretty good\"}")
-def create_rating_for_user(
+async def create_rating_for_user(
     item_json: str = Form(...),  # Expect the data as a stringified JSON,
     db: Session = Depends(get_db),
     current_user: str = Depends(oauth2.get_current_user),
@@ -28,7 +28,8 @@ def create_rating_for_user(
     except (json.JSONDecodeError, ValidationError):
         raise HTTPException(status_code=400, detail="Invalid item data")
     
-    return crud.create_user_rating(db=db, rating=item, owner_name=current_user, picture=picture)
+    result = await crud.create_user_rating(db=db, rating=item, owner_name=current_user, picture=picture)
+    return result
 
 #read ratings by restaurant
 @router.get("/{restaurant_id}/read", response_model=list[schemas.Rating], summary="Read ratings by restaurant")

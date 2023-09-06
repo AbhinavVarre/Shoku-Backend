@@ -4,7 +4,6 @@ import boto3
 import os
 from dotenv import load_dotenv
 from urllib.parse import quote
-import magic
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 allowed_mimes = {'image/png', 
@@ -34,9 +33,7 @@ async def upload_file_to_s3 (file: UploadFile):
         raise HTTPException (status_code=status.HTTP_400_BAD_REQUEST, detail="File size must be between 1 and 5 MB")
 
     #check file MIME type
-    mime = magic.Magic(mime=True)
-    file_mime_type = mime.from_buffer(file.file.read(1024))  # Read only the first 1024 bytes to determine MIME type
-    file.file.seek(0)  # Reset file pointer
+    file_mime_type = file.content_type
     if file_mime_type not in allowed_mimes:
          raise HTTPException (status_code=status.HTTP_400_BAD_REQUEST, detail=f'Unsupported file type: {file_mime_type}. Supprted types are: {allowed_mimes}')
 
@@ -49,5 +46,5 @@ async def upload_file_to_s3 (file: UploadFile):
     s3_client.upload_fileobj(file.file, S3_BUCKET_NAME, file.filename)
     file_key = quote(file.filename, safe='') # type: ignore
     url = f"https://{S3_BUCKET_NAME}.s3.{S3_REGION}.amazonaws.com/{file_key}"
-    return url
+    return url 
 
