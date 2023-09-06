@@ -7,8 +7,7 @@ from urllib.parse import quote
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 allowed_mimes = {'image/png', 
-                 'image/jpeg', 
-                 'image/gif'}
+                 'image/jpeg'}
 
 def hash(password: str):
     return pwd_context.hash(password)
