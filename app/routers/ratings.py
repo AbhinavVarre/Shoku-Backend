@@ -1,7 +1,11 @@
-from fastapi import Depends, FastAPI, HTTPException, APIRouter
-from app import schemas, models, crud
+from fastapi import Depends, FastAPI, HTTPException, APIRouter, UploadFile, File, Form
+from app import schemas, models, crud, oauth2, utils
 from app.database import get_db
 from sqlalchemy.orm import Session
+from typing import Annotated, Tuple
+from pydantic import ValidationError
+import json
+import datetime
 
 router = APIRouter(
     prefix="/ratings",
@@ -10,12 +14,36 @@ router = APIRouter(
 
 
 #post a rating from a user for a restaurant
-@router.post("/{owner_name}/new", response_model=schemas.Rating, summary="Post a rating from a user for a restaurant")
-def create_rating_for_user(item: schemas.RatingCreate, owner_name: str, db: Session = Depends(get_db)):
+@router.post("/new", response_model=schemas.Rating, summary="Post a rating from a user for a restaurant")
+async def create_rating_for_user(
+    item_json: str = Form(...),  # Expect the data as a stringified JSON,
+    db: Session = Depends(get_db),
+    current_user: str = Depends(oauth2.get_current_user),
+    picture: UploadFile = File(None) 
+):
     """
-    Create a rating for a restaurant, from a specified user.
+    input a json containing the following fields: score, restaurant_id, and optionally a review like {\"score\": 0, \"restaurant_id\": 1, \"review\": \"pretty good\"}
     """
-    return crud.create_user_rating(db=db, rating=item, owner_name=owner_name)
+    try:
+        # Convert the stringified JSON to a dict
+        item_data = json.loads(item_json)
+        # Convert the dict to the desired Pydantic model
+        item = schemas.RatingCreate(**item_data)
+    except (json.JSONDecodeError, ValidationError):
+        raise HTTPException(status_code=400, detail="Invalid item data")
+    
+    current_date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")
+    owner = crud.get_user(db, name=current_user)
+    pictureUrl = None
+    if picture:
+        pictureUrl = await utils.upload_file_to_s3(picture)
+    db_item = models.Ratings(
+        **item.model_dump(), owner_id=owner.id, created_at=current_date, pictureUrl=pictureUrl
+    )
+    db.add(db_item)
+    db.commit()
+    db.refresh(db_item)
+    return db_item
 
 #read ratings by restaurant
 @router.get("/{restaurant_id}/read", response_model=list[schemas.Rating], summary="Read ratings by restaurant")

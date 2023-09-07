@@ -1,4 +1,14 @@
 from pydantic import BaseModel, ConfigDict
+from fastapi import UploadFile
+
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+
+
+class TokenData(BaseModel):
+    id: int | None = None
 
 class RatingBase(BaseModel):
     score: int
@@ -15,6 +25,7 @@ class Rating(RatingBase):
     owner_id: int
     restaurant_id: int
     score: int
+    pictureUrl: str | None = None
     review: str | None = None
 
 
@@ -28,7 +39,6 @@ class Restaurant(RestaurantBase):
     model_config = ConfigDict(from_attributes=True)
     
     id: int
-    #list_id: int
     ratings: list[Rating] = []
 
 class PictureBase(BaseModel):
