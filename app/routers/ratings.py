@@ -13,13 +13,16 @@ router = APIRouter(
 
 
 #post a rating from a user for a restaurant
-@router.post("/new", response_model=schemas.Rating, summary="Post a rating from a user for a restaurant", description="input a json containing the following fields: score, restaurant_id, and optionally a review like {\"score\": 0, \"restaurant_id\": 1, \"review\": \"pretty good\"}")
+@router.post("/new", response_model=schemas.Rating, summary="Post a rating from a user for a restaurant")
 async def create_rating_for_user(
     item_json: str = Form(...),  # Expect the data as a stringified JSON,
     db: Session = Depends(get_db),
     current_user: str = Depends(oauth2.get_current_user),
     picture: UploadFile = File(None) 
 ):
+    """
+    input a json containing the following fields: score, restaurant_id, and optionally a review like {\"score\": 0, \"restaurant_id\": 1, \"review\": \"pretty good\"}
+    """
     try:
         # Convert the stringified JSON to a dict
         item_data = json.loads(item_json)
