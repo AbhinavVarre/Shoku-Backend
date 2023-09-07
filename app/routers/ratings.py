@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 from typing import Annotated, Tuple
 from pydantic import ValidationError
 import json
+import datetime
 
 router = APIRouter(
     prefix="/ratings",
@@ -31,8 +32,18 @@ async def create_rating_for_user(
     except (json.JSONDecodeError, ValidationError):
         raise HTTPException(status_code=400, detail="Invalid item data")
     
-    result = await crud.create_user_rating(db=db, rating=item, owner_name=current_user, picture=picture)
-    return result
+    current_date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")
+    owner = crud.get_user(db, name=current_user)
+    pictureUrl = None
+    if picture:
+        pictureUrl = await utils.upload_file_to_s3(picture)
+    db_item = models.Ratings(
+        **item.model_dump(), owner_id=owner.id, created_at=current_date, pictureUrl=pictureUrl
+    )
+    db.add(db_item)
+    db.commit()
+    db.refresh(db_item)
+    return db_item
 
 #read ratings by restaurant
 @router.get("/{restaurant_id}/read", response_model=list[schemas.Rating], summary="Read ratings by restaurant")
