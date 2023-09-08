@@ -24,7 +24,7 @@ def create_list(list: schemas.RestaurantListCreate, current_user_name: str = Dep
 #add a restaurant to a user's list
 @router.post("/{list_name}/add/{restaurant_name}", response_model=schemas.RestaurantList, summary="Add a restaurant to a user's list")
 def add_to_list(list_name: str, restaurant_name:str, current_user_name: str = Depends(oauth2.get_current_user), db: Session = Depends(get_db)):
-    list = read_list(db=db, owner_name=current_user_name, list_name=list_name)
+    list = read_list(db=db, list_name=list_name)
     restaurant = crud.read_restaurant(db, name=restaurant_name)
     list.restaurants.append(restaurant)
     db.add(restaurant)
@@ -34,14 +34,14 @@ def add_to_list(list_name: str, restaurant_name:str, current_user_name: str = De
 
 #read all lists for a user
 @router.get("/all", response_model=list[schemas.RestaurantList],summary="Read all lists for a user")
-def read_all_lists(owner_name: str, current_user_name: str = Depends(oauth2.get_current_user), db: Session = Depends(get_db)):
+def read_all_lists(current_user_name: str = Depends(oauth2.get_current_user), db: Session = Depends(get_db)):
     return crud.get_user(db, name=current_user_name).lists
 
 #read a user's list
 @router.get("read/{list_name}", response_model=schemas.RestaurantList, summary="Read a user's list")
-def read_list(owner_name: str, list_name: str, current_user_name: str = Depends(oauth2.get_current_user), db: Session = Depends(get_db)):
-    lists = read_all_lists(db=db, owner_name=current_user_name)
+def read_list(list_name: str, current_user_name: str = Depends(oauth2.get_current_user), db: Session = Depends(get_db)):
+    lists = read_all_lists(db=db)
     restaurant_list = next((lst for lst in lists if lst.name == list_name), None)
     if restaurant_list is None:
-        raise HTTPException(status_code=404, detail="List not found")
+        raise HTTPException(status_code=404, detail=f"List not found for user {current_user_name}")
     return restaurant_list
