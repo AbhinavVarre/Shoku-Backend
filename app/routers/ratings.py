@@ -18,7 +18,7 @@ router = APIRouter(
 async def create_rating_for_user(
     item_json: str = Form(...),  # Expect the data as a stringified JSON,
     db: Session = Depends(get_db),
-    current_user: str = Depends(oauth2.get_current_user),
+    current_user_name: str = Depends(oauth2.get_current_user),
     picture: UploadFile = File(None) 
 ):
     """
@@ -33,7 +33,7 @@ async def create_rating_for_user(
         raise HTTPException(status_code=400, detail="Invalid item data")
     
     current_date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")
-    owner = crud.get_user(db, name=current_user)
+    owner = crud.get_user(db, name=current_user_name)
     pictureUrl = None
     if picture:
         pictureUrl = await utils.upload_file_to_s3(picture)
