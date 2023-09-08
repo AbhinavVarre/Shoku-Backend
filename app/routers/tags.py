@@ -47,8 +47,8 @@ def tag_restaurant(restaurant_name: str, tag_name, db: Session = Depends(get_db)
     db.refresh(restaurant)
     return restaurant
 
-#Read all restaurants assocaited with a tag
-@router.get("/{tag_name}/restaurants", response_model=list[schemas.Restaurant],summary="Read all restaurants assocaited with a tag")
+#Read all restaurants associated with a tag
+@router.get("/{tag_name}/restaurants", response_model=list[schemas.Restaurant],summary="Read all restaurants associated with a tag")
 def get_restaurants_by_tag(tag_name: str, db: Session = Depends(get_db)):
     tag = read_tag(db=db, name=tag_name)
     return tag.restaurants
