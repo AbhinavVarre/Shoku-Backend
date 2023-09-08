@@ -24,7 +24,7 @@ def create_list(list: schemas.RestaurantListCreate, owner_name: str, db: Session
 #add a restaurant to a user's list
 @router.post("/{owner_name}/{list_name}/add/{restaurant_name}", response_model=schemas.RestaurantList, summary="Add a restaurant to a user's list")
 def add_to_list(owner_name: str, list_name: str, restaurant_name:str, db: Session = Depends(get_db)):
-    list = read_list(owner_name=owner_name, list_name=list_name)
+    list = read_list(db=db, owner_name=owner_name, list_name=list_name)
     restaurant = crud.read_restaurant(db, name=restaurant_name)
     list.restaurants.append(restaurant)
     db.add(restaurant)
@@ -40,8 +40,8 @@ def read_all_lists(owner_name: str, db: Session = Depends(get_db)):
 #read a user's list
 @router.get("/{owner_name}/{list_name}", response_model=schemas.RestaurantList, summary="Read a user's list")
 def read_list(owner_name: str, list_name: str, db: Session = Depends(get_db)):
-    lists = read_all_lists(owner_name=owner_name)
-    restaurant_list = next((lst for lst in lists if lst.name == owner_name), None)
+    lists = read_all_lists(db=db, owner_name=owner_name)
+    restaurant_list = next((lst for lst in lists if lst.name == list_name), None)
     if restaurant_list is None:
         raise HTTPException(status_code=404, detail="List not found")
     return restaurant_list

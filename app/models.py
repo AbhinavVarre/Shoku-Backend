@@ -90,7 +90,7 @@ class Tags(Base):
     __tablename__ = "tags"
     
     id = Column('id', Integer, primary_key=True)
-    name = Column('name', String(50), nullable=False)
+    name = Column('name', String)
     
     restaurants = relationship(
         'Restaurants', 
