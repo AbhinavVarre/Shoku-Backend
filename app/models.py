@@ -46,6 +46,13 @@ restaurant_association = Table(
     Column('restaurant_list_id', Integer, ForeignKey('restaurant_lists.id'), primary_key=True)
 )
 
+# Many to many relationship between restaurants and tags
+tag_association = Table('tag_association', Base.metadata,
+    Column('restaurant_id', Integer, ForeignKey('restaurants.id')),
+    Column('tag_id', Integer, ForeignKey('tags.id'))
+)
+
+
 class Restaurants (Base):
     __tablename__ = "restaurants"
     id = Column('id', Integer, primary_key = True)
@@ -56,6 +63,12 @@ class Restaurants (Base):
     lists = relationship( 
         'RestaurantLists',
         secondary=restaurant_association,
+        back_populates='restaurants'
+    )
+
+    tags = relationship(
+        'Tags',
+        secondary=tag_association,
         back_populates='restaurants'
     )
 
@@ -71,5 +84,17 @@ class RestaurantLists (Base):
         'Restaurants', 
         secondary=restaurant_association,
         back_populates='lists' 
+    )
+
+class Tags(Base):
+    __tablename__ = "tags"
+    
+    id = Column('id', Integer, primary_key=True)
+    name = Column('name', String(50), nullable=False)
+    
+    restaurants = relationship(
+        'Restaurants', 
+        secondary=tag_association,
+        back_populates='tags'
     )
 
