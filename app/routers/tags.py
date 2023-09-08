@@ -30,6 +30,12 @@ def read_tag(name: str, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Tag not found")
     return tag
 
+#get all tags
+@router.get("/get", response_model=list[schemas.Tag], summary="Get all tags")
+def read_tags(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+    tags = db.query(models.Tags).offset(skip).limit(limit).all()
+    return tags
+
 #Tag a restaurant
 @router.post("/{restaurant_name}/add/{tag_name}", response_model=schemas.Restaurant, summary="Tag a restaurant")
 def tag_restaurant(restaurant_name: str, tag_name, db: Session = Depends(get_db)):
