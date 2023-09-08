@@ -22,7 +22,7 @@ def create_list(list: schemas.RestaurantListCreate, owner_name: str, db: Session
     return db_restaurant_list
 
 #add a restaurant to a user's list
-@router.post("/{owner_name}/{list_name}/add/{restaurant_name}", response_model=schemas.RestaurantList, tags=["lists"], summary="Add a restaurant to a user's list")
+@router.post("/{owner_name}/{list_name}/add/{restaurant_name}", response_model=schemas.RestaurantList, summary="Add a restaurant to a user's list")
 def add_to_list(owner_name: str, list_name: str, restaurant_name:str, db: Session = Depends(get_db)):
     list = read_list(owner_name=owner_name, list_name=list_name)
     restaurant = crud.read_restaurant(db, name=restaurant_name)

@@ -1,5 +1,6 @@
 from pydantic import BaseModel, ConfigDict
 from fastapi import UploadFile
+from typing import ForwardRef
 
 
 class Token(BaseModel):
@@ -29,6 +30,19 @@ class Rating(RatingBase):
     review: str | None = None
 
 
+class TagBase(BaseModel):
+    name: str
+
+class TagCreate(TagBase):
+    pass
+
+class Tag(TagBase):
+    model_config = ConfigDict(from_attributes=True)
+    
+    id: int
+    #restaurants: list[Restaurant] = []
+
+
 class RestaurantBase(BaseModel):
     name: str
 
@@ -40,6 +54,7 @@ class Restaurant(RestaurantBase):
     
     id: int
     ratings: list[Rating] = []
+    tags: list[Tag] = []
 
 class PictureBase(BaseModel):
     picture: bytes
