@@ -34,15 +34,25 @@ async def create_rating_for_user(
     
     current_date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")
     owner = crud.get_user(db, name=current_user_name)
-    pictureUrl = None
-    if picture:
-        pictureUrl = await utils.upload_file_to_s3(picture)
+    
     db_item = models.Ratings(
-        **item.model_dump(), owner_id=owner.id, created_at=current_date, pictureUrl=pictureUrl
+        **item.model_dump(), owner_id=owner.id, created_at=current_date,
     )
     db.add(db_item)
     db.commit()
     db.refresh(db_item)
+    if picture:
+        rating_id = db_item.id
+        db_picture = await utils.create_picture(
+            picture = picture, 
+            rating_id = rating_id,  # type: ignore
+            owner_id = owner.id,  # type: ignore
+            current_date=current_date,
+            db=db,
+        )
+        db_item.pictures.append(db_picture) 
+        db.commit()
+        db.refresh(db_item)
     return db_item
 
 #read ratings by restaurant

@@ -22,21 +22,22 @@ class Ratings (Base):
     created_at = Column('created_at', String)
     score = Column('score', Integer)
     review = Column('review', String)
-    pictureUrl = Column('pictureURL', String)
+    
 
     user = relationship('Users', back_populates='ratings')
     restaurant = relationship('Restaurants', back_populates='ratings')
-    pictures = relationship('Pictures', back_populates='review')
+    pictures = relationship('Pictures', back_populates='rating')
 
 class Pictures (Base):
     __tablename__ = "pictures"
     id = Column('id', Integer, primary_key = True)
     owner_id = Column('owner_id', Integer, ForeignKey('users.id'))
     rating_id = Column('rating_id', Integer, ForeignKey('ratings.id'))
-    picture = Column('picture', LargeBinary)
+    pictureUrl = Column('pictureURL', String)
+    created_at = Column('created_at', String)
 
     user = relationship('Users', back_populates='pictures')
-    review = relationship('Ratings', back_populates='pictures')
+    rating = relationship('Ratings', back_populates='pictures')
 
 # Many to many relationship between restaurants and restaurant lists
 restaurant_association = Table(

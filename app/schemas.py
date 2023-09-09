@@ -19,6 +19,19 @@ class RatingBase(BaseModel):
 class RatingCreate(RatingBase):
     pass
 
+class PictureBase(BaseModel):
+    pictureUrl: str
+
+class PictureCreate(PictureBase):
+    pass
+ 
+class Picture(PictureBase):
+    model_config = ConfigDict(from_attributes=True)
+    
+    id: int
+    owner_id: int
+    rating_id: int
+
 class Rating(RatingBase):
     model_config = ConfigDict(from_attributes=True)
     
@@ -26,7 +39,8 @@ class Rating(RatingBase):
     owner_id: int
     restaurant_id: int
     score: int
-    pictureUrl: str | None = None
+    created_at: str | None = None
+    pictures: list[Picture] = []  
     review: str | None = None
 
 
@@ -56,19 +70,6 @@ class Restaurant(RestaurantBase):
     ratings: list[Rating] = []
     tags: list[Tag] = []
 
-class PictureBase(BaseModel):
-    picture: bytes
-
-class PictureCreate(PictureBase):
-    pass
- 
-class Picture(PictureBase):
-    model_config = ConfigDict(from_attributes=True)
-    
-    id: int
-    owner_id: int
-    rating_id: int
-
 class RestaurantListBase(BaseModel):
     name: str
     description: str
@@ -95,4 +96,4 @@ class User(UserBase):
     id: int
     ratings: list[Rating] = []
     lists: list[RestaurantList] = []
-    #pictures: list['Picture'] = []  
+    pictures: list[Picture] = []  
