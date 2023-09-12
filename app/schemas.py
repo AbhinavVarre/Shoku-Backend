@@ -1,5 +1,6 @@
 from pydantic import BaseModel, ConfigDict
 from fastapi import UploadFile
+from typing import ForwardRef
 
 
 class Token(BaseModel):
@@ -18,6 +19,19 @@ class RatingBase(BaseModel):
 class RatingCreate(RatingBase):
     pass
 
+class PictureBase(BaseModel):
+    pictureUrl: str
+
+class PictureCreate(PictureBase):
+    pass
+ 
+class Picture(PictureBase):
+    model_config = ConfigDict(from_attributes=True)
+    
+    id: int
+    owner_id: int
+    rating_id: int
+
 class Rating(RatingBase):
     model_config = ConfigDict(from_attributes=True)
     
@@ -25,8 +39,22 @@ class Rating(RatingBase):
     owner_id: int
     restaurant_id: int
     score: int
-    pictureUrl: str | None = None
+    created_at: str | None = None
+    pictures: list[Picture] = []  
     review: str | None = None
+
+
+class TagBase(BaseModel):
+    name: str
+
+class TagCreate(TagBase):
+    pass
+
+class Tag(TagBase):
+    model_config = ConfigDict(from_attributes=True)
+    
+    id: int
+    #restaurants: list[Restaurant] = []
 
 
 class RestaurantBase(BaseModel):
@@ -40,19 +68,7 @@ class Restaurant(RestaurantBase):
     
     id: int
     ratings: list[Rating] = []
-
-class PictureBase(BaseModel):
-    picture: bytes
-
-class PictureCreate(PictureBase):
-    pass
- 
-class Picture(PictureBase):
-    model_config = ConfigDict(from_attributes=True)
-    
-    id: int
-    owner_id: int
-    rating_id: int
+    tags: list[Tag] = []
 
 class RestaurantListBase(BaseModel):
     name: str
@@ -80,4 +96,4 @@ class User(UserBase):
     id: int
     ratings: list[Rating] = []
     lists: list[RestaurantList] = []
-    #pictures: list['Picture'] = []  
+    pictures: list[Picture] = []  

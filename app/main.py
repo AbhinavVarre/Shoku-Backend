@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 
 from . import crud, models, schemas
 from .database import get_db
-from .routers import auth, users, restaurants, ratings, lists
+from .routers import auth, users, restaurants, ratings, lists, tags
 
 #models.Base.metadata.create_all(bind=engine)
 
@@ -29,6 +29,10 @@ tags_metadata = [
         "name": "lists",
         "description": "Create, upload to, and delete from lists.",
     },
+    {
+        "name": "tags",
+        "description": "Create, upload to, and delete from tags.",
+    },
 ]
 
 app = FastAPI(openapi_tags=tags_metadata)
@@ -39,6 +43,7 @@ app.include_router(users.router)
 app.include_router(restaurants.router)
 app.include_router(ratings.router)
 app.include_router(lists.router)
+app.include_router(tags.router)
 
 
 #CORS

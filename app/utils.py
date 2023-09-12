@@ -1,9 +1,12 @@
 from passlib.context import CryptContext
-from fastapi import UploadFile, HTTPException,status
+from fastapi import UploadFile, HTTPException,status, File, Depends
 import boto3
 import os
 from dotenv import load_dotenv
 from urllib.parse import quote
+from . import models
+from .database import get_db
+from sqlalchemy.orm import Session
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 allowed_mimes = {'image/png', 
@@ -21,6 +24,14 @@ S3_BUCKET_NAME = os.getenv("S3_BUCKET_NAME")
 S3_ACCESS_KEY = os.getenv("S3_ACCESS_KEY")
 S3_SECRET_KEY = os.getenv("S3_SECRET_KEY")
 S3_REGION = os.getenv("S3_REGION")
+
+async def create_picture(rating_id: int, owner_id: int, current_date: str, picture: UploadFile = File(None), db: Session = Depends(get_db) ):
+    pictureUrl = await upload_file_to_s3(picture)
+    db_picture = models.Pictures(rating_id = rating_id, owner_id=owner_id, pictureUrl=pictureUrl, created_at=current_date)
+    db.add(db_picture)
+    db.commit()
+    db.refresh(db_picture)
+    return db_picture
 
 async def upload_file_to_s3 (file: UploadFile):
 

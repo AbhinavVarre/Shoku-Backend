@@ -18,7 +18,7 @@ router = APIRouter(
 async def create_rating_for_user(
     item_json: str = Form(...),  # Expect the data as a stringified JSON,
     db: Session = Depends(get_db),
-    current_user: str = Depends(oauth2.get_current_user),
+    current_user_name: str = Depends(oauth2.get_current_user),
     picture: UploadFile = File(None) 
 ):
     """
@@ -33,16 +33,26 @@ async def create_rating_for_user(
         raise HTTPException(status_code=400, detail="Invalid item data")
     
     current_date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")
-    owner = crud.get_user(db, name=current_user)
-    pictureUrl = None
-    if picture:
-        pictureUrl = await utils.upload_file_to_s3(picture)
+    owner = crud.get_user(db, name=current_user_name)
+    
     db_item = models.Ratings(
-        **item.model_dump(), owner_id=owner.id, created_at=current_date, pictureUrl=pictureUrl
+        **item.model_dump(), owner_id=owner.id, created_at=current_date,
     )
     db.add(db_item)
     db.commit()
     db.refresh(db_item)
+    if picture:
+        rating_id = db_item.id
+        db_picture = await utils.create_picture(
+            picture = picture, 
+            rating_id = rating_id,  # type: ignore
+            owner_id = owner.id,  # type: ignore
+            current_date=current_date,
+            db=db,
+        )
+        db_item.pictures.append(db_picture) 
+        db.commit()
+        db.refresh(db_item)
     return db_item
 
 #read ratings by restaurant

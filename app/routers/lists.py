@@ -1,5 +1,5 @@
 from fastapi import Depends, FastAPI, HTTPException, APIRouter
-from app import schemas, models, crud
+from app import schemas, models, crud, oauth2
 from app.database import get_db
 from sqlalchemy.orm import Session
 from .. import utils
@@ -12,9 +12,9 @@ router = APIRouter(
 
 
 #create a list for a user
-@router.post("/{owner_name}/add", response_model=schemas.RestaurantList, summary="Create a list for a user")
-def create_list(list: schemas.RestaurantListCreate, owner_name: str, db: Session = Depends(get_db)):
-    user =crud.get_user(db, name=owner_name)
+@router.post("/add", response_model=schemas.RestaurantList, summary="Create a list for a user")
+def create_list(list: schemas.RestaurantListCreate, current_user_name: str = Depends(oauth2.get_current_user), db: Session = Depends(get_db)):
+    user =crud.get_user(db, name=current_user_name)
     db_restaurant_list = models.RestaurantLists( **list.model_dump(), owner_id=user.id)
     db.add(db_restaurant_list)
     db.commit()
@@ -22,9 +22,9 @@ def create_list(list: schemas.RestaurantListCreate, owner_name: str, db: Session
     return db_restaurant_list
 
 #add a restaurant to a user's list
-@router.post("/{owner_name}/{list_name}/add/{restaurant_name}", response_model=schemas.RestaurantList, tags=["lists"], summary="Add a restaurant to a user's list")
-def add_to_list(owner_name: str, list_name: str, restaurant_name:str, db: Session = Depends(get_db)):
-    list = read_list(owner_name=owner_name, list_name=list_name)
+@router.post("/{list_name}/add/{restaurant_name}", response_model=schemas.RestaurantList, summary="Add a restaurant to a user's list")
+def add_to_list(list_name: str, restaurant_name:str, current_user_name: str = Depends(oauth2.get_current_user), db: Session = Depends(get_db)):
+    list = read_list(db=db, list_name=list_name)
     restaurant = crud.read_restaurant(db, name=restaurant_name)
     list.restaurants.append(restaurant)
     db.add(restaurant)
@@ -33,15 +33,15 @@ def add_to_list(owner_name: str, list_name: str, restaurant_name:str, db: Sessio
     return list
 
 #read all lists for a user
-@router.get("/{owner_name}/all", response_model=list[schemas.RestaurantList],summary="Read all lists for a user")
-def read_all_lists(owner_name: str, db: Session = Depends(get_db)):
-    return crud.get_user(db, name=owner_name).lists
+@router.get("/all", response_model=list[schemas.RestaurantList],summary="Read all lists for a user")
+def read_all_lists(current_user_name: str = Depends(oauth2.get_current_user), db: Session = Depends(get_db)):
+    return crud.get_user(db, name=current_user_name).lists
 
 #read a user's list
-@router.get("/{owner_name}/{list_name}", response_model=schemas.RestaurantList, summary="Read a user's list")
-def read_list(owner_name: str, list_name: str, db: Session = Depends(get_db)):
-    lists = read_all_lists(owner_name=owner_name)
-    restaurant_list = next((lst for lst in lists if lst.name == owner_name), None)
+@router.get("read/{list_name}", response_model=schemas.RestaurantList, summary="Read a user's list")
+def read_list(list_name: str, current_user_name: str = Depends(oauth2.get_current_user), db: Session = Depends(get_db)):
+    lists = read_all_lists(db=db)
+    restaurant_list = next((lst for lst in lists if lst.name == list_name), None)
     if restaurant_list is None:
-        raise HTTPException(status_code=404, detail="List not found")
+        raise HTTPException(status_code=404, detail=f"List not found for user {current_user_name}")
     return restaurant_list
