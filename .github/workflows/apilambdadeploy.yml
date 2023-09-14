@@ -31,7 +31,7 @@ jobs:
           pipenv install --deploy --dev
 
       - name: Create requirements.txt file from pipenv
-        run: pipenv lock -r > requirements.txt
+        run: pipenv requirements > requirements.txt
 
       - name: Dowload dependencies to file
         run: pip3 install -t dep -r requirements.txt
