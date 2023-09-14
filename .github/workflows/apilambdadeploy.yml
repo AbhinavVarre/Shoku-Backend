@@ -40,6 +40,7 @@ jobs:
         run: |
           cd dep
           zip ../lambda-artifact.zip -r .
+          cd ..
           zip ./lambda-artifact.zip -u app
       
       - name: Upload zip file artifact
