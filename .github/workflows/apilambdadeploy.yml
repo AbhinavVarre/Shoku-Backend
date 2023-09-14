@@ -7,14 +7,14 @@ on:
 jobs: 
 
   CI:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
   
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: 3.10
+          python-version: "3.10"
 
       - name: Install Python Virtual ENV
         run: python3 -m pip3 install --upgrade pipenv wheel
