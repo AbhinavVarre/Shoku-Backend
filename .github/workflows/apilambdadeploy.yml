@@ -16,11 +16,13 @@ jobs:
         with:
           python-version: "3.10"
 
-      - name: Install Python Virtual ENV
-        run: pip3 install --upgrade pipenv wheel
+      - name: Install Python Virtual ENV and pipenv
+        run: |
+          pip3 install --upgrade pipenv wheel
+          pip3 install virtualenv
 
       - id: cache-pipenv
-        uses: actions/cache@v1
+        uses: actions/cache@v3
         with:
           path: ~/.local/share/virtualenvs
           key: ${{ runner.os }}-pipenv-${{ hashFiles('**/Pipfile.lock') }}
@@ -32,8 +34,16 @@ jobs:
 
       - name: Create requirements.txt file from pipenv
         run: pipenv requirements > requirements.txt
+      
+      - name: Dependencies cache
+        uses: actions/cache@v3
+        id: cache-deps
+        with:
+          path: dep
+          key: ${{ runner.os }}-dep-${{ hashFiles('**/requirements*.txt') }}
 
       - name: Dowload dependencies to file
+        if: steps.cache-deps.outputs.cache-hit != 'true'
         run: pip3 install -t dep -r requirements.txt
 
       - name: Create zip file with dependencies and app
@@ -44,7 +54,7 @@ jobs:
           zip ./lambda-artifact.zip -u app
       
       - name: Upload zip file artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: lambda-artifact
           path: lambda-artifact.zip
