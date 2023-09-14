@@ -1,6 +1,9 @@
 from fastapi import Depends, FastAPI, HTTPException, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
+from mangum import Mangum
+import os
+
 
 from . import crud, models, schemas
 from .database import get_db
@@ -35,6 +38,9 @@ tags_metadata = [
     },
 ]
 
+stage = os.environ.get('STAGE', None)
+openapi_prefix = f"/{stage}" if stage else "/"
+
 app = FastAPI(openapi_tags=tags_metadata)
 
 #including routers
@@ -56,6 +62,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+handler = Mangum(app)
 
 
 

@@ -1,0 +1,56 @@
+name: FastAPI CI/CD
+on:
+  push:
+    branches:
+    - main
+    - develop
+  workflow_dispatch:
+
+jobs: 
+
+  CI:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+  
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.10
+
+      - name: Install Python Virtual ENV
+        run: python3 -m pip3 install --upgrade pipenv wheel
+
+      - id: cache-pipenv
+        uses: actions/cache@v1
+        with:
+          path: ~/.local/share/virtualenvs
+          key: ${{ runner.os }}-pipenv-${{ hashFiles('**/Pipfile.lock') }}
+
+      - name: Install dependencies
+        if: steps.cache-pipenv.outputs.cache-hit != 'true'
+        run: |
+          pipenv install --deploy --dev
+
+      - name: Create requirements.txt file from pipenv
+        run: pipenv lock -r > requirements.txt
+
+      - name: Dowload dependencies to file
+        run: pip3 install -t dep -r requirements.txt
+
+      - name: Create zip file with dependencies and app
+        run: |
+          cd dep
+          zip ../lambda-artifact.zip -r .
+          zip ./lambda-artifact.zip -u app
+      
+      - name: Upload zip file artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: lambda-artifact
+          path: lambda-artifact.zip
+        
+
+
+
+
