@@ -1,9 +1,7 @@
 name: FastAPI CI/CD
 on:
   push:
-    branches:
-    - main
-    - develop
+    branches: [ "**" ]
   workflow_dispatch:
 
 jobs: 
@@ -49,8 +47,3 @@ jobs:
         with:
           name: lambda-artifact
           path: lambda-artifact.zip
-        
-
-
-
-
