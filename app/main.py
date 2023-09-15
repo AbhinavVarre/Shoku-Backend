@@ -13,7 +13,7 @@ from .routers import auth, users, restaurants, ratings, lists, tags
 
 tags_metadata = [
     {
-        "name": "Authentication",
+        "name": "authentication",
         "description": "Login function",
     },
     {
