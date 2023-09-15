@@ -43,6 +43,11 @@ openapi_prefix = f"/{stage}" if stage else "/"
 
 app = FastAPI(openapi_tags=tags_metadata)
 
+# Default Return
+@app.get("/")
+def read_root():
+    return "Welcome to the Shoku Dev API!"
+
 #including routers
 app.include_router(auth.router)
 app.include_router(users.router)
