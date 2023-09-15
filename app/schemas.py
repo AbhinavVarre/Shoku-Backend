@@ -1,4 +1,15 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
+from fastapi import UploadFile
+from typing import ForwardRef
+
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+
+
+class TokenData(BaseModel):
+    id: int | None = None
 
 class RatingBase(BaseModel):
     score: int
@@ -8,16 +19,42 @@ class RatingBase(BaseModel):
 class RatingCreate(RatingBase):
     pass
 
+class PictureBase(BaseModel):
+    pictureUrl: str
+
+class PictureCreate(PictureBase):
+    pass
+ 
+class Picture(PictureBase):
+    model_config = ConfigDict(from_attributes=True)
+    
+    id: int
+    owner_id: int
+    rating_id: int
+
 class Rating(RatingBase):
+    model_config = ConfigDict(from_attributes=True)
+    
     id: int
     owner_id: int
     restaurant_id: int
     score: int
+    created_at: str | None = None
+    pictures: list[Picture] = []  
     review: str | None = None
-    created_at: str
 
-    class Config:
-        orm_mode = True
+
+class TagBase(BaseModel):
+    name: str
+
+class TagCreate(TagBase):
+    pass
+
+class Tag(TagBase):
+    model_config = ConfigDict(from_attributes=True)
+    
+    id: int
+    #restaurants: list[Restaurant] = []
 
 
 class RestaurantBase(BaseModel):
@@ -27,26 +64,11 @@ class RestaurantCreate(RestaurantBase):
     pass
 
 class Restaurant(RestaurantBase):
+    model_config = ConfigDict(from_attributes=True)
+    
     id: int
-    #list_id: int
     ratings: list[Rating] = []
-
-    class Config:
-        orm_mode = True
-
-class PictureBase(BaseModel):
-    picture: bytes
-
-class PictureCreate(PictureBase):
-    pass
- 
-class Picture(PictureBase):
-    id: int
-    owner_id: int
-    rating_id: int
-
-    class Config:
-        orm_mode = True
+    tags: list[Tag] = []
 
 class RestaurantListBase(BaseModel):
     name: str
@@ -56,11 +78,9 @@ class RestaurantListCreate(RestaurantListBase):
     pass
 
 class RestaurantList(RestaurantListBase):
+    model_config = ConfigDict(from_attributes=True)
     id: int
     restaurants: list[Restaurant] = []
-
-    class Config:
-        orm_mode = True
 
 class UserBase(BaseModel):
     name: str
@@ -71,10 +91,9 @@ class UserCreate(UserBase):
 
 
 class User(UserBase):
+    model_config = ConfigDict(from_attributes=True)
+    
     id: int
     ratings: list[Rating] = []
     lists: list[RestaurantList] = []
-    #pictures: list['Picture'] = []  
-
-    class Config:
-        orm_mode = True
+    pictures: list[Picture] = []  

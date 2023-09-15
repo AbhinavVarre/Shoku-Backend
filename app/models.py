@@ -22,20 +22,22 @@ class Ratings (Base):
     created_at = Column('created_at', String)
     score = Column('score', Integer)
     review = Column('review', String)
+    
 
     user = relationship('Users', back_populates='ratings')
     restaurant = relationship('Restaurants', back_populates='ratings')
-    pictures = relationship('Pictures', back_populates='review')
+    pictures = relationship('Pictures', back_populates='rating')
 
 class Pictures (Base):
     __tablename__ = "pictures"
     id = Column('id', Integer, primary_key = True)
     owner_id = Column('owner_id', Integer, ForeignKey('users.id'))
     rating_id = Column('rating_id', Integer, ForeignKey('ratings.id'))
-    picture = Column('picture', LargeBinary)
+    pictureUrl = Column('pictureURL', String)
+    created_at = Column('created_at', String)
 
     user = relationship('Users', back_populates='pictures')
-    review = relationship('Ratings', back_populates='pictures')
+    rating = relationship('Ratings', back_populates='pictures')
 
 # Many to many relationship between restaurants and restaurant lists
 restaurant_association = Table(
@@ -44,6 +46,13 @@ restaurant_association = Table(
     Column('restaurant_id', Integer, ForeignKey('restaurants.id'), primary_key=True),
     Column('restaurant_list_id', Integer, ForeignKey('restaurant_lists.id'), primary_key=True)
 )
+
+# Many to many relationship between restaurants and tags
+tag_association = Table('tag_association', Base.metadata,
+    Column('restaurant_id', Integer, ForeignKey('restaurants.id')),
+    Column('tag_id', Integer, ForeignKey('tags.id'))
+)
+
 
 class Restaurants (Base):
     __tablename__ = "restaurants"
@@ -55,6 +64,12 @@ class Restaurants (Base):
     lists = relationship( 
         'RestaurantLists',
         secondary=restaurant_association,
+        back_populates='restaurants'
+    )
+
+    tags = relationship(
+        'Tags',
+        secondary=tag_association,
         back_populates='restaurants'
     )
 
@@ -70,5 +85,17 @@ class RestaurantLists (Base):
         'Restaurants', 
         secondary=restaurant_association,
         back_populates='lists' 
+    )
+
+class Tags(Base):
+    __tablename__ = "tags"
+    
+    id = Column('id', Integer, primary_key=True)
+    name = Column('name', String)
+    
+    restaurants = relationship(
+        'Restaurants', 
+        secondary=tag_association,
+        back_populates='tags'
     )
 
