@@ -1,6 +1,9 @@
 from fastapi import Depends, FastAPI, HTTPException, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
+from mangum import Mangum
+import os
+
 
 from . import crud, models, schemas
 from .database import get_db
@@ -10,7 +13,7 @@ from .routers import auth, users, restaurants, ratings, lists, tags
 
 tags_metadata = [
     {
-        "name": "Authentication",
+        "name": "authentication",
         "description": "Login function",
     },
     {
@@ -35,7 +38,15 @@ tags_metadata = [
     },
 ]
 
+stage = os.environ.get('STAGE', None)
+openapi_prefix = f"/{stage}" if stage else "/"
+
 app = FastAPI(openapi_tags=tags_metadata)
+
+# Default Return
+@app.get("/")
+def read_root():
+    return "Welcome to the Shoku Dev API!"
 
 #including routers
 app.include_router(auth.router)
@@ -56,6 +67,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+handler = Mangum(app)
 
 
 

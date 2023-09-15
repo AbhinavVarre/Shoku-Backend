@@ -1,0 +1,83 @@
+name: FastAPI CI/CD
+on:
+  pull_request:
+    branches: [develop]
+  workflow_dispatch:
+
+jobs: 
+
+  CI:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+  
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+
+      - name: Install Python Virtual ENV and pipenv
+        run: |
+          pip3 install --upgrade pipenv wheel
+          pip3 install virtualenv
+
+      - id: cache-pipenv
+        uses: actions/cache@v3
+        with:
+          path: ~/.local/share/virtualenvs
+          key: ${{ runner.os }}-pipenv-${{ hashFiles('**/Pipfile.lock') }}
+
+      - name: Install dependencies
+        if: steps.cache-pipenv.outputs.cache-hit != 'true'
+        run: |
+          pipenv install --deploy --dev
+
+      - name: Create requirements.txt file from pipenv
+        run: pipenv requirements > requirements.txt
+      
+      - name: Dependencies cache
+        uses: actions/cache@v3
+        id: cache-deps
+        with:
+          path: dep
+          key: ${{ runner.os }}-dep-${{ hashFiles('**/requirements*.txt') }}
+
+      - name: Download dependencies to file
+        if: steps.cache-deps.outputs.cache-hit != 'true'
+        run: pip3 install -t dep -r requirements.txt
+
+      - name: Create zip file with dependencies and app
+        run: |
+          cd dep
+          zip ../lambda-artifact.zip -r .
+          cd ..
+          zip ./lambda-artifact.zip -u -r app
+
+      - name: Upload zip file artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: lambda-artifact
+          path: lambda-artifact.zip
+  CD:
+    runs-on: ubuntu-latest
+    needs: [CI]
+    steps:
+      - name: Download lambda-artifact.zip 
+        uses: actions/download-artifact@v3
+        with:
+          name: lambda-artifact
+      - name: Upload to S3 Bucket
+        run: aws s3 cp lambda-artifact.zip s3://apideploymentzip/lambda-artifact.zip
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_SECRET_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+      - name: Deploy a new Lambda
+        run: aws lambda update-function-code --function-name shoku-dev-api --s3-bucket apideploymentzip --s3-key lambda-artifact.zip
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_SECRET_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
+      
+
+    
