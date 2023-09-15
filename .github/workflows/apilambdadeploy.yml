@@ -51,7 +51,7 @@ jobs:
           cd dep
           zip ../lambda-artifact.zip -r .
           cd ..
-          zip ./lambda-artifact.zip -u app
+          zip ./lambda-artifact.zip -u -r app
       
       - name: Upload zip file artifact
         uses: actions/upload-artifact@v3
