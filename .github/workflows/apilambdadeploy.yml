@@ -81,7 +81,7 @@ jobs:
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           AWS_DEFAULT_REGION: ${{ secrets.AWS_DEFAULT_REGION }}
       - name: Call the api
-        run: curl -X GET "https://3ecbvld2afqv7hvtrpudbobsly0mbjpl.lambda-url.us-east-2.on.aws"  >> $API_CALL_RETURN
+        run: curl -s -X GET "https://3ecbvld2afqv7hvtrpudbobsly0mbjpl.lambda-url.us-east-2.on.aws"  >> $API_CALL_RETURN
       - name: Check that api is up
         if: ${{ 'Welcome to the Shoku Dev API!' != env.API_CALL_RETURN}}
         run: exit 1
