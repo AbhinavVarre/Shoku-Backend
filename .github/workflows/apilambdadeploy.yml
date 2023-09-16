@@ -12,10 +12,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Call the api
-        run: curl -s -X GET "https://3ecbvld2afqv7hvtrpudbobsly0mbjpl.lambda-url.us-east-2.on.aws" >> tmp.txt
-      - name: check api call
-        run: |
-          output=cat tmp.txt
+        run: | 
+          output=curl -s -X GET "https://3ecbvld2afqv7hvtrpudbobsly0mbjpl.lambda-url.us-east-2.on.aws"
           if ["$output" != "Welcome to the Shoku Dev API!"]; then
             exit 1
           fi
