@@ -14,6 +14,6 @@ jobs:
       - name: Call the api
         run: curl -s -X GET "https://3ecbvld2afqv7hvtrpudbobsly0mbjpl.lambda-url.us-east-2.on.aws" >> tmp.txt
       - name: Check that api is up
-        run: cat tmp.txt
+        run: cat tmp.txt == "Welcome to the Shoku Dev API!"
 
 
