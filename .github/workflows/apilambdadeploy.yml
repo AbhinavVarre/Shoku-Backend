@@ -14,6 +14,6 @@ jobs:
       - name: Call the api
         run: curl -s -X GET "https://3ecbvld2afqv7hvtrpudbobsly0mbjpl.lambda-url.us-east-2.on.aws" >> env.API_CALL_RETURN
       - name: Check that api is up
-        run: echo env.API_CALL_RETURN
+        run: echo ${{env.API_CALL_RETURN}}
 
 
