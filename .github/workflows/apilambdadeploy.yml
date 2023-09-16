@@ -85,6 +85,6 @@ jobs:
           output=$(curl -s -X GET "https://3ecbvld2afqv7hvtrpudbobsly0mbjpl.lambda-url.${{ secrets.AWS_DEFAULT_REGION }}.on.aws")
           if ["$output" != "Welcome to the Shoku Dev API!"]; then
             exit 1
-          else;
+          else
             echo "Simple health check passed!"
           fi
