@@ -13,7 +13,7 @@ jobs:
     steps:
       - name: Call the api
         run: | 
-          output=curl -s -X GET "https://3ecbvld2afqv7hvtrpudbobsly0mbjpl.lambda-url.us-east-2.on.aws"
+          output=$(curl -s -X GET "https://3ecbvld2afqv7hvtrpudbobsly0mbjpl.lambda-url.us-east-2.on.aws")
           if ["$output" != "Welcome to the Shoku Dev API!"]; then
             exit 1
           fi
