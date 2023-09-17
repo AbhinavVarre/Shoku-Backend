@@ -41,7 +41,7 @@ tags_metadata = [
 stage = os.environ.get('STAGE', None)
 openapi_prefix = f"/{stage}" if stage else "/"
 
-app = FastAPI(openapi_tags=tags_metadata,openapi_url='/dev/openapi.json', docs_url='/docs',)
+app = FastAPI(openapi_tags=tags_metadata, root_path = openapi_prefix)
 
 # Default Return
 @app.get("/")
