@@ -40,10 +40,10 @@ tags_metadata = [
 ]
 
 load_dotenv()
-stage = os.getenv('STAGE', None)
+stage = os.getenv('STAGE')
 openapi_prefix = f"/{stage}" if stage else "/"
 
-app = FastAPI(openapi_tags=tags_metadata, root_path=openapi_prefix) 
+app = FastAPI(openapi_tags=tags_metadata, root_path=f"{openapi_prefix}") 
 
 # Default Return
 @app.get("/")
