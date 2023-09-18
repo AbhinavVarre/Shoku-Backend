@@ -5,7 +5,6 @@ from sqlalchemy.orm import Session
 from typing import Annotated, Tuple
 from pydantic import ValidationError
 import json
-import datetime
 
 router = APIRouter(
     prefix="/ratings",
@@ -32,7 +31,7 @@ async def create_rating_for_user(
     except (json.JSONDecodeError, ValidationError):
         raise HTTPException(status_code=400, detail="Invalid item data")
     
-    current_date = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")
+    current_date = utils.get_date()
     owner = crud.get_user(db, name=current_user_name)
     
     db_item = models.Ratings(

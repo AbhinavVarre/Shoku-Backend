@@ -7,6 +7,7 @@ from urllib.parse import quote
 from . import models
 from .database import get_db
 from sqlalchemy.orm import Session
+import datetime
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 allowed_mimes = {'image/png', 
@@ -18,6 +19,9 @@ def hash(password: str):
 
 def verify(plain_password, hashed_password):
     return pwd_context.verify(plain_password, hashed_password)
+
+def get_date():
+    return datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")
 
 load_dotenv()
 S3_BUCKET_NAME = os.getenv("S3_BUCKET_NAME")
