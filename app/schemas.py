@@ -31,6 +31,7 @@ class Picture(PictureBase):
     id: int
     owner_id: int
     rating_id: int
+    created_at: str | None = None
 
 class Rating(RatingBase):
     model_config = ConfigDict(from_attributes=True)
