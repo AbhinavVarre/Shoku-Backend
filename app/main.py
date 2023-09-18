@@ -38,10 +38,10 @@ tags_metadata = [
     },
 ]
 
-stage = os.getenv('STAGE', None)
-openapi_prefix = f"/{stage}" if stage else "/"
+# stage = os.getenv('STAGE', None)
+# openapi_prefix = f"/{stage}" if stage else "/"
 
-app = FastAPI(openapi_tags=tags_metadata, root_path=openapi_prefix)
+app = FastAPI(openapi_tags=tags_metadata, root_path="/dev")
 
 # Default Return
 @app.get("/")
