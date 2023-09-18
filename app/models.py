@@ -1,4 +1,4 @@
-from sqlalchemy import Table, Column, Integer, BigInteger, String, ForeignKey, Unicode, LargeBinary, Time, DateTime, Date, Text, Boolean, Float, JSON
+from sqlalchemy import Table, Column, Integer, String, ForeignKey, DateTime, func, Date, Text, Boolean, Float, JSON
 from sqlalchemy.orm import relationship, backref, deferred
 from .database import Base
 
@@ -19,7 +19,7 @@ class Ratings (Base):
     id = Column('id', Integer, primary_key = True)
     owner_id = Column('owner_id', Integer, ForeignKey('users.id'))
     restaurant_id = Column('restaurant_id', Integer, ForeignKey('restaurants.id'))
-    created_at = Column('created_at', String)
+    created_at = Column('created_at', DateTime, default=func.now())
     score = Column('score', Integer)
     review = Column('review', String)
     
@@ -34,7 +34,7 @@ class Pictures (Base):
     owner_id = Column('owner_id', Integer, ForeignKey('users.id'))
     rating_id = Column('rating_id', Integer, ForeignKey('ratings.id'))
     pictureUrl = Column('pictureURL', String)
-    created_at = Column('created_at', String)
+    created_at = Column('created_at', DateTime, default=func.now())
 
     user = relationship('Users', back_populates='pictures')
     rating = relationship('Ratings', back_populates='pictures')

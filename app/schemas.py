@@ -1,6 +1,7 @@
 from pydantic import BaseModel, ConfigDict
 from fastapi import UploadFile
 from typing import ForwardRef
+from datetime import datetime
 
 
 class Token(BaseModel):
@@ -31,6 +32,7 @@ class Picture(PictureBase):
     id: int
     owner_id: int
     rating_id: int
+    created_at: datetime | None = None
 
 class Rating(RatingBase):
     model_config = ConfigDict(from_attributes=True)
@@ -39,7 +41,7 @@ class Rating(RatingBase):
     owner_id: int
     restaurant_id: int
     score: int
-    created_at: str | None = None
+    created_at: datetime | None = None
     pictures: list[Picture] = []  
     review: str | None = None
 
