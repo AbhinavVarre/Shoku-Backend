@@ -2,6 +2,7 @@ from fastapi import Depends, FastAPI, HTTPException, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from mangum import Mangum
+from dotenv import load_dotenv
 import os
 
 
@@ -38,10 +39,11 @@ tags_metadata = [
     },
 ]
 
-# stage = os.getenv('STAGE', None)
-# openapi_prefix = f"/{stage}" if stage else "/"
+load_dotenv()
+stage = os.getenv('STAGE', None)
+openapi_prefix = f"/{stage}" if stage else "/"
 
-app = FastAPI(openapi_tags=tags_metadata, root_path="/dev")
+app = FastAPI(openapi_tags=tags_metadata, root_path=openapi_prefix) 
 
 # Default Return
 @app.get("/")
