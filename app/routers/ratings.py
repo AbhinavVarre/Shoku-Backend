@@ -31,11 +31,10 @@ async def create_rating_for_user(
     except (json.JSONDecodeError, ValidationError):
         raise HTTPException(status_code=400, detail="Invalid item data")
     
-    current_date = utils.get_date()
     owner = crud.get_user(db, name=current_user_name)
     
     db_item = models.Ratings(
-        **item.model_dump(), owner_id=owner.id, created_at=current_date,
+        **item.model_dump(), owner_id=owner.id,
     )
     db.add(db_item)
     db.commit()
@@ -46,7 +45,6 @@ async def create_rating_for_user(
             picture = picture, 
             rating_id = rating_id,  # type: ignore
             owner_id = owner.id,  # type: ignore
-            current_date=current_date,
             db=db,
         )
         db_item.pictures.append(db_picture) 
