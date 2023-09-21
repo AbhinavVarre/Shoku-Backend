@@ -10,7 +10,7 @@ jobs:
     container:
       image: amazon/aws-lambda-python:3.10
       volumes:
-        - ${{ github.workspace }}:/app
+        - ${{ github.workspace }}:/usr/dir
     steps:
       - uses: actions/setup-node@v3
         with:
