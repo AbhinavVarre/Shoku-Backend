@@ -8,7 +8,7 @@ jobs:
   CI:
     runs-on: ubuntu-latest
     container: 
-      image: amazon/aws-lambda-python:3.10
+      image: public.ecr.aws/lambda/python:3.10
       volumes:
         - ${{ github.workspace }}:/app
     steps:
