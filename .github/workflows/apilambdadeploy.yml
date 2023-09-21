@@ -7,47 +7,54 @@ on:
 jobs:
   CI:
     runs-on: ubuntu-latest
-    container: 
-      image: public.ecr.aws/lambda/python:3.10
-      volumes:
-        - ${{ github.workspace }}:/app
     steps:
+
       - uses: actions/checkout@v3
 
-      - name: Set up Python
-        uses: actions/setup-python@v4
+      # - name: Set up Python
+      #   uses: actions/setup-python@v4
+      #   with:
+      #     python-version: "3.10"
+
+      # - name: Install Python Virtual ENV and pipenv
+      #   run: |
+      #     pip3 install --upgrade pipenv wheel
+      #     pip3 install virtualenv
+
+      # - id: cache-pipenv
+      #   uses: actions/cache@v3
+      #   with:
+      #     path: ~/.local/share/virtualenvs
+      #     key: ${{ runner.os }}-pipenv-${{ hashFiles('**/Pipfile.lock') }}
+      - name: Run Lambda Docker Container
+        uses: addnab/docker-run-action@v3
         with:
-          python-version: "3.10"
+          image: docker://amazon/aws-lambda-python:3.10
+          options: -v ${{ github.workspace }}:/var/www
+          run: |
+            pip install pipenv
+            pipenv install --deploy --dev
+            pipenv requirements > requirements.txt
+            pip install -t dep -r requirements.txt
+  
+      # - name: Install dependencies
+      #   if: steps.cache-pipenv.outputs.cache-hit != 'true'
+      #   run: |
+      #     pipenv install --deploy --dev
 
-      - name: Install Python Virtual ENV and pipenv
-        run: |
-          pip3 install --upgrade pipenv wheel
-          pip3 install virtualenv
+      # - name: Create requirements.txt file from pipenv
+      #   run: pipenv requirements > requirements.txt
 
-      - id: cache-pipenv
-        uses: actions/cache@v3
-        with:
-          path: ~/.local/share/virtualenvs
-          key: ${{ runner.os }}-pipenv-${{ hashFiles('**/Pipfile.lock') }}
+      # - name: Dependencies cache
+      #   uses: actions/cache@v3
+      #   id: cache-deps
+      #   with:
+      #     path: dep
+      #     key: ${{ runner.os }}-dep-${{ hashFiles('**/requirements*.txt') }}
 
-      - name: Install dependencies
-        if: steps.cache-pipenv.outputs.cache-hit != 'true'
-        run: |
-          pipenv install --deploy --dev
-
-      - name: Create requirements.txt file from pipenv
-        run: pipenv requirements > requirements.txt
-
-      - name: Dependencies cache
-        uses: actions/cache@v3
-        id: cache-deps
-        with:
-          path: dep
-          key: ${{ runner.os }}-dep-${{ hashFiles('**/requirements*.txt') }}
-
-      - name: Download dependencies to file
-        if: steps.cache-deps.outputs.cache-hit != 'true'
-        run: pip3 install -t dep -r requirements.txt
+      # - name: Download dependencies to file
+      #   # if: steps.cache-deps.outputs.cache-hit != 'true'
+      #   run: pip3 install -t dep -r requirements.txt
 
       - name: Create zip file with dependencies and app
         run: |
