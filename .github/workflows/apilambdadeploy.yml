@@ -31,7 +31,7 @@ jobs:
         with:
           image: docker://amazon/aws-lambda-python:3.10
           options: -v ${{ github.workspace }}:/var/www
-          run: |
+          run: /
             pip install pipenv
             pipenv install --deploy --dev
             pipenv requirements > requirements.txt
