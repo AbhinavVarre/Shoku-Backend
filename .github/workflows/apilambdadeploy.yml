@@ -30,7 +30,6 @@ jobs:
         uses: addnab/docker-run-action@v3
         with:
           image: docker://amazon/aws-lambda-python:3.10
-          options: -v ${{ github.workspace }}:/work -e ABC=123
           run: |
             pip install pipenv
             pipenv install --deploy --dev
