@@ -4,43 +4,19 @@ on:
     branches: [develop]
   workflow_dispatch:
 
+env:
+  API_CALL_RETURN: Default
+
 jobs:
-  Install-Deps:
-    runs-on: ubuntu-latest
-    container:
-      image: amazon/aws-lambda-python:3.10
-      volumes:
-        - ${{ github.workspace }}:/usr/dir
-    steps:
-      - uses: actions/setup-node@v3
-        with:
-          node-version: '16.x'
-      - name: Check out the repo
-        uses: actions/checkout@v3
-      - name: Running Installs
-        run: |
-          pip install pipenv
-          pipenv install --deploy --dev
-          pipenv requirements > requirements.txt
-          pip install -t dep -r requirements.txt
-
-
   CI:
     runs-on: ubuntu-latest
-    container:
-      image: amazon/aws-lambda-python:3.10
-      volumes:
-        - ${{ github.workspace }}:/app
     steps:
-      - uses: actions/setup-node@v3
-        with:
-          node-version: '16.x'
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
-      # - name: Set up Python
-      #   uses: actions/setup-python@v4
-      #   with:
-      #     python-version: "3.10"
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
 
       - name: Install Python Virtual ENV and pipenv
         run: |
@@ -52,17 +28,7 @@ jobs:
         with:
           path: ~/.local/share/virtualenvs
           key: ${{ runner.os }}-pipenv-${{ hashFiles('**/Pipfile.lock') }}
-      - name: Run Lambda Docker Container
-        uses: addnab/docker-run-action@v3
-        with:
-          image: docker://amazon/aws-lambda-python:3.10
-          options: -v ${{ github.workspace }}:/usr/www
-          run: |
-            pip install pipenv
-            pipenv install --deploy --dev
-            pipenv requirements > requirements.txt
-            pip install -t dep -r requirements.txt
-  
+
       - name: Install dependencies
         if: steps.cache-pipenv.outputs.cache-hit != 'true'
         run: |
@@ -80,7 +46,14 @@ jobs:
 
       - name: Download dependencies to file
         if: steps.cache-deps.outputs.cache-hit != 'true'
-        run: pip3 install -t dep -r requirements.txt
+        run: |
+          pip3  \    
+          --platform manylinux2014_x86_64 \
+          --target=dep \
+          --implementation cp \
+          --python-version 3.11 \
+          --only-binary=:all: --upgrade \
+          install -t dep -r requirements.txt
 
       - name: Create zip file with dependencies and app
         run: |
