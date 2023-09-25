@@ -47,14 +47,7 @@ jobs:
       - name: Download dependencies to file
         if: steps.cache-deps.outputs.cache-hit != 'true'
         run: |
-          pip3  \    
-          --platform manylinux2014_x86_64 \
-          --target=dep \
-          --implementation cp \
-          --python-version 3.11 \
-          --only-binary=:all: --upgrade \
-          install -t dep -r requirements.txt
-
+          pip3 install --platform manylinux2014_x86_64 --target=dep --implementation cp  --python-version 3.11 --only-binary=:all: --upgrade -t dep -r requirements.txt
       - name: Create zip file with dependencies and app
         run: |
           cd dep
