@@ -70,8 +70,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-allowed_mimes = ['image/png', 
-                 'image/jpeg']
+
 handler = Mangum(app)
 
 
