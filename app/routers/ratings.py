@@ -17,7 +17,7 @@ router = APIRouter(
 async def create_rating_for_user(
     item_json: str = Form(...),  # Expect the data as a stringified JSON,
     db: Session = Depends(get_db),
-    current_user_name: str = Depends(oauth2.get_current_user),
+    owner: models.Users = Depends(oauth2.get_current_user),
     picture: UploadFile = File(None) 
 ):
     """
@@ -30,8 +30,6 @@ async def create_rating_for_user(
         item = schemas.RatingCreate(**item_data)
     except (json.JSONDecodeError, ValidationError):
         raise HTTPException(status_code=400, detail="Invalid item data")
-    
-    owner = crud.get_user(db, name=current_user_name)
     
     db_item = models.Ratings(
         **item.model_dump(), owner_id=owner.id,
