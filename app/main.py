@@ -43,7 +43,7 @@ load_dotenv()
 stage = os.getenv('STAGE')
 openapi_prefix = "/" if stage == 'local' else "/dev"
 
-app = FastAPI(openapi_tags=tags_metadata, root_path=openapi_prefix, text_mime_types=["*/*"]) 
+app = FastAPI(openapi_tags=tags_metadata, root_path=openapi_prefix) 
 
 # Default Return
 @app.get("/")
@@ -70,7 +70,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-handler = Mangum(app)
+allowed_mimes = ['image/png', 
+                 'image/jpeg']
+handler = Mangum(app, binary_media_types=allowed_mimes)
 
 
 
