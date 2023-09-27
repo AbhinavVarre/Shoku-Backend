@@ -43,7 +43,7 @@ load_dotenv()
 stage = os.getenv('STAGE')
 openapi_prefix = "/" if stage == 'local' else "/dev"
 
-app = FastAPI(openapi_tags=tags_metadata, root_path=openapi_prefix) 
+app = FastAPI(openapi_tags=tags_metadata, root_path=openapi_prefix, text_mime_types=["*/*"]) 
 
 # Default Return
 @app.get("/")
