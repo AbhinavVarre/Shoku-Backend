@@ -72,7 +72,7 @@ app.add_middleware(
 
 allowed_mimes = ['image/png', 
                  'image/jpeg']
-handler = Mangum(app, binary_media_types=allowed_mimes)
+handler = Mangum(app)
 
 
 
