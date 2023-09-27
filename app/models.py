@@ -102,6 +102,10 @@ class RestaurantLists (Base):
         back_populates='lists'
     )
 
+    @property
+    def user_names(self):
+        return [user.name for user in self.users]
+
 class Tags(Base):
     __tablename__ = "tags"
     
@@ -113,4 +117,8 @@ class Tags(Base):
         secondary=tag_association,
         back_populates='tags'
     )
+
+    @property
+    def restaurant_names(self):
+        return [restaurant.name for restaurant in self.restaurants]
 
