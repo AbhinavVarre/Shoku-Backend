@@ -29,9 +29,9 @@ S3_ACCESS_KEY = os.getenv("S3_ACCESS_KEY")
 S3_SECRET_KEY = os.getenv("S3_SECRET_KEY")
 S3_REGION = os.getenv("S3_REGION")
 
-async def create_picture(rating_id: int, owner_id: int, current_date: str, picture: UploadFile = File(None), db: Session = Depends(get_db) ):
+async def create_picture(rating_id: int, owner_id: int, picture: UploadFile = File(None), db: Session = Depends(get_db) ):
     pictureUrl = await upload_file_to_s3(picture)
-    db_picture = models.Pictures(rating_id = rating_id, owner_id=owner_id, pictureUrl=pictureUrl, created_at=current_date)
+    db_picture = models.Pictures(rating_id = rating_id, owner_id=owner_id, pictureUrl=pictureUrl)
     db.add(db_picture)
     db.commit()
     db.refresh(db_picture)
