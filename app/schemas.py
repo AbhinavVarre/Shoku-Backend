@@ -56,7 +56,7 @@ class Tag(TagBase):
     model_config = ConfigDict(from_attributes=True)
     
     id: int
-    #restaurants: list[Restaurant] = []
+    restaurant_names: list['str'] = []
 
 
 class RestaurantBase(BaseModel):
@@ -83,6 +83,7 @@ class RestaurantList(RestaurantListBase):
     model_config = ConfigDict(from_attributes=True)
     id: int
     restaurants: list[Restaurant] = []
+    user_names: list[str] = []
 
 class UserBase(BaseModel):
     name: str
