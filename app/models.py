@@ -10,21 +10,21 @@ from sqlalchemy.dialects.postgresql import UUID
 restaurant_association = Table(
     'restaurant_list_association',
     Base.metadata,
-    Column('restaurant_id', Integer, ForeignKey('restaurants.id'), primary_key=True),
-    Column('restaurant_list_id', Integer, ForeignKey('restaurant_lists.id'), primary_key=True)
+    Column('restaurant_id', UUID(as_uuid=True), ForeignKey('restaurants.id'), primary_key=True),
+    Column('restaurant_list_id', UUID(as_uuid=True), ForeignKey('restaurant_lists.id'), primary_key=True)
 )
 
 # Many to many relationship between restaurants and tags
 tag_association = Table('tag_association', Base.metadata,
-    Column('restaurant_id', Integer, ForeignKey('restaurants.id'), primary_key=True),
-    Column('tag_id', Integer, ForeignKey('tags.id'), primary_key=True)
+    Column('restaurant_id', UUID(as_uuid=True), ForeignKey('restaurants.id'), primary_key=True),
+    Column('tag_id', UUID(as_uuid=True), ForeignKey('tags.id'), primary_key=True)
 )
 
 # Many to many relationship between lists and users
 list_user_association = Table(
     'list_user_association', Base.metadata,
-    Column('user_id', Integer, ForeignKey('users.id'), primary_key=True),
-    Column('list_id', Integer, ForeignKey('restaurant_lists.id'), primary_key=True)
+    Column('user_id', UUID(as_uuid=True), ForeignKey('users.id'), primary_key=True),
+    Column('list_id', UUID(as_uuid=True), ForeignKey('restaurant_lists.id'), primary_key=True)
 )
 
 class Users (Base):

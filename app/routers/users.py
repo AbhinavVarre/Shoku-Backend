@@ -31,7 +31,7 @@ def read_users(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
 #read user data by name
 @router.get("/name/{name}", response_model=schemas.User, summary="Read user data by name")
 def read_user(name: str, db: Session = Depends(get_db)):
-    db_user = crud.get_user(db, name=name)
+    db_user = crud.get_user(db=db, name=name)
     return db_user
 
 #read user data by id
