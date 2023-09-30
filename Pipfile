@@ -21,6 +21,7 @@ passlib = {extras = ["bcrypt"], version = "*"}
 boto3 = "*"
 exceptiongroup = "*"
 mangum = "*"
+uuid = "*"
 
 [dev-packages]
 pytest = ">=7.4.0"
