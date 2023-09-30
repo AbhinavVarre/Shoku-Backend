@@ -2,6 +2,7 @@ from pydantic import BaseModel, ConfigDict
 from fastapi import UploadFile
 from typing import ForwardRef
 from datetime import datetime
+from uuid import UUID
 
 
 class Token(BaseModel):
@@ -10,11 +11,11 @@ class Token(BaseModel):
 
 
 class TokenData(BaseModel):
-    id: int | None = None
+    id: UUID | None = None
 
 class RatingBase(BaseModel):
     score: int
-    restaurant_id: int
+    restaurant_id: UUID
     review: str | None = None
 
 class RatingCreate(RatingBase):
@@ -29,17 +30,17 @@ class PictureCreate(PictureBase):
 class Picture(PictureBase):
     model_config = ConfigDict(from_attributes=True)
     
-    id: int
-    owner_id: int
-    rating_id: int
+    id: UUID
+    owner_id: UUID
+    rating_id: UUID
     created_at: datetime | None = None
 
 class Rating(RatingBase):
     model_config = ConfigDict(from_attributes=True)
     
-    id: int
-    owner_id: int
-    restaurant_id: int
+    id: UUID
+    owner_id: UUID
+    restaurant_id: UUID
     score: int
     created_at: datetime | None = None
     pictures: list[Picture] = []  
@@ -55,7 +56,7 @@ class TagCreate(TagBase):
 class Tag(TagBase):
     model_config = ConfigDict(from_attributes=True)
     
-    id: int
+    id: UUID
     restaurant_names: list['str'] = []
 
 
@@ -68,7 +69,7 @@ class RestaurantCreate(RestaurantBase):
 class Restaurant(RestaurantBase):
     model_config = ConfigDict(from_attributes=True)
     
-    id: int
+    id: UUID
     ratings: list[Rating] = []
     tags: list[Tag] = []
 
@@ -81,7 +82,7 @@ class RestaurantListCreate(RestaurantListBase):
 
 class RestaurantList(RestaurantListBase):
     model_config = ConfigDict(from_attributes=True)
-    id: int
+    id: UUID
     restaurants: list[Restaurant] = []
     user_names: list[str] = []
 
@@ -96,7 +97,7 @@ class UserCreate(UserBase):
 class User(UserBase):
     model_config = ConfigDict(from_attributes=True)
     
-    id: int
+    id: UUID
     ratings: list[Rating] = []
     lists: list[RestaurantList] = []
     pictures: list[Picture] = []  
