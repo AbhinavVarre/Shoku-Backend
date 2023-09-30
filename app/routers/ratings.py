@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 from typing import Annotated, Tuple
 from pydantic import ValidationError
 import json
+from uuid import UUID
 
 router = APIRouter(
     prefix="/ratings",
@@ -52,13 +53,13 @@ async def create_rating_for_user(
 
 #read ratings by restaurant
 @router.get("/{restaurant_id}/read", response_model=list[schemas.Rating], summary="Read ratings by restaurant")
-def read_ratings(restaurant_id: int, db: Session = Depends(get_db)):
+def read_ratings(restaurant_id: UUID, db: Session = Depends(get_db)):
     items = crud.get_ratings(db, restaurant_id=restaurant_id)
     return items
 
 #read ratings by user
 @router.get("/{user_id}/ratings/", response_model=list[schemas.Rating], summary="Read ratings by user")
-def read_user_ratings(user_id: int, db: Session = Depends(get_db)):
+def read_user_ratings(user_id: UUID, db: Session = Depends(get_db)):
     """
     Returns the average rating for a restaurant. If there are no raings, returns 0.
     """

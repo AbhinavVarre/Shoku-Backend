@@ -3,6 +3,7 @@ from app import schemas, models, crud
 from app.database import get_db
 from sqlalchemy.orm import Session
 from .. import utils
+from uuid import UUID
 
 
 router = APIRouter(
@@ -35,6 +36,6 @@ def read_user(name: str, db: Session = Depends(get_db)):
 
 #read user data by id
 @router.get("/id/{user_id}", response_model=schemas.User, summary="Read user data by id")
-def read_user_by_id(user_id: int, db: Session = Depends(get_db)):
+def read_user_by_id(user_id: UUID, db: Session = Depends(get_db)):
     db_user = crud.get_user_by_id(db, id=user_id)
     return db_user

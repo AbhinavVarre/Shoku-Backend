@@ -3,6 +3,7 @@ from app import schemas, models, crud, oauth2
 from app.database import get_db
 from sqlalchemy.orm import Session
 from .. import utils
+from uuid import UUID
 
 
 router = APIRouter(
@@ -22,7 +23,7 @@ def create_list(list: schemas.RestaurantListCreate, user: models.Users = Depends
 
 #share list with another user
 @router.post("/{list_name}/share/{user_id}", response_model=schemas.RestaurantList, summary="Share list with another user")
-def share_list(list_name: str, user_id:int, current_user: models.Users = Depends(oauth2.get_current_user), db: Session = Depends(get_db)):
+def share_list(list_name: str, user_id:UUID, current_user: models.Users = Depends(oauth2.get_current_user), db: Session = Depends(get_db)):
     list = read_list(db=db, list_name=list_name, current_user=current_user)
     user = crud.get_user_by_id(db, id=user_id)
     list.users.append(user)
