@@ -45,8 +45,8 @@ class Users (Base):
 class Ratings (Base):
     __tablename__ = "ratings"
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, unique=True, nullable=False)
-    owner_id = Column('owner_id', Integer, ForeignKey('users.id'))
-    restaurant_id = Column('restaurant_id', Integer, ForeignKey('restaurants.id'))
+    owner_id = Column('owner_id', UUID(as_uuid=True), ForeignKey('users.id'))
+    restaurant_id = Column('restaurant_id', UUID(as_uuid=True), ForeignKey('restaurants.id'))
     created_at = Column('created_at', DateTime, default=func.now())
     score = Column('score', Integer)
     review = Column('review', String)
@@ -59,8 +59,8 @@ class Ratings (Base):
 class Pictures (Base):
     __tablename__ = "pictures"
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, unique=True, nullable=False)
-    owner_id = Column('owner_id', Integer, ForeignKey('users.id'))
-    rating_id = Column('rating_id', Integer, ForeignKey('ratings.id'))
+    owner_id = Column('owner_id', UUID(as_uuid=True), ForeignKey('users.id'))
+    rating_id = Column('rating_id', UUID(as_uuid=True), ForeignKey('ratings.id'))
     pictureUrl = Column('pictureURL', String)
     created_at = Column('created_at', DateTime, default=func.now())
 
@@ -71,7 +71,7 @@ class Restaurants (Base):
     __tablename__ = "restaurants"
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, unique=True, nullable=False)
     name = Column('name', String)
-    #list_id = Column('list_id', Integer, ForeignKey('restaurant_lists.id'))
+    #list_id = Column('list_id', UUID(as_uuid=True), ForeignKey('restaurant_lists.id'))
 
     ratings = relationship('Ratings', back_populates='restaurant')
     lists = relationship( 
