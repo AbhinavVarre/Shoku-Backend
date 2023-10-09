@@ -32,7 +32,7 @@ def read_restaurant(name: str, db: Session = Depends(get_db)):
     return db_restaurant
 
 #read restaurant data by id
-@router.get("/id/{name}", response_model=schemas.Restaurant, summary="Read restaurant data by id")
+@router.get("/id/{id}", response_model=schemas.Restaurant, summary="Read restaurant data by id")
 def read_restaurant_by_id(id: int, db: Session = Depends(get_db)):
     db_restaurant = crud.read_restaurant_by_id(db, id=id)
     return db_restaurant
