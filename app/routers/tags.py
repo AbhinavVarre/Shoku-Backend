@@ -38,7 +38,7 @@ def read_tags(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
 
 #Tag a restaurant
 @router.post("/{restaurant_name}/add/{tag_name}", response_model=schemas.Restaurant, summary="Tag a restaurant")
-def tag_restaurant(restaurant_name: str, tag_name, db: Session = Depends(get_db)):
+def tag_restaurant(restaurant_name: str, tag_name:str, db: Session = Depends(get_db)):
     restaurant = crud.read_restaurant(db, name=restaurant_name)
     tag = read_tag(db=db, name=tag_name)
     restaurant.tags.append(tag)
