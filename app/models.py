@@ -1,25 +1,53 @@
-from sqlalchemy import Table, Column, Integer, BigInteger, String, ForeignKey, Unicode, LargeBinary, Time, DateTime, Date, Text, Boolean, Float, JSON
+from sqlalchemy import Table, Column, Integer, String, ForeignKey, DateTime, func, Date, Text, Boolean, Float, JSON
 from sqlalchemy.orm import relationship, backref, deferred
 from .database import Base
+import uuid
+from sqlalchemy.dialects.postgresql import UUID
 
 
+
+# Many to many relationship between restaurants and restaurant lists
+restaurant_association = Table(
+    'restaurant_list_association',
+    Base.metadata,
+    Column('restaurant_id', UUID(as_uuid=True), ForeignKey('restaurants.id'), primary_key=True),
+    Column('restaurant_list_id', UUID(as_uuid=True), ForeignKey('restaurant_lists.id'), primary_key=True)
+)
+
+# Many to many relationship between restaurants and tags
+tag_association = Table('tag_association', Base.metadata,
+    Column('restaurant_id', UUID(as_uuid=True), ForeignKey('restaurants.id'), primary_key=True),
+    Column('tag_id', UUID(as_uuid=True), ForeignKey('tags.id'), primary_key=True)
+)
+
+# Many to many relationship between lists and users
+list_user_association = Table(
+    'list_user_association', Base.metadata,
+    Column('user_id', UUID(as_uuid=True), ForeignKey('users.id'), primary_key=True),
+    Column('list_id', UUID(as_uuid=True), ForeignKey('restaurant_lists.id'), primary_key=True)
+)
 
 class Users (Base):
     __tablename__ = "users"
-    id = Column('id', Integer, primary_key = True)
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, unique=True, nullable=False)
     name = Column('name', String)
     password = Column('password', String)
 
     ratings = relationship('Ratings', back_populates='user')
     pictures = relationship('Pictures', back_populates='user')
-    lists = relationship('RestaurantLists', back_populates='user')
+
+    lists = relationship(
+        'RestaurantLists', 
+        secondary=list_user_association, 
+        back_populates='users'
+    )
 
 class Ratings (Base):
     __tablename__ = "ratings"
-    id = Column('id', Integer, primary_key = True)
-    owner_id = Column('owner_id', Integer, ForeignKey('users.id'))
-    restaurant_id = Column('restaurant_id', Integer, ForeignKey('restaurants.id'))
-    created_at = Column('created_at', String)
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, unique=True, nullable=False)
+    owner_id = Column('owner_id', UUID(as_uuid=True), ForeignKey('users.id'))
+    restaurant_id = Column('restaurant_id', UUID(as_uuid=True), ForeignKey('restaurants.id'))
+    created_at = Column('created_at', DateTime, default=func.now())
     score = Column('score', Integer)
     review = Column('review', String)
     
@@ -30,35 +58,20 @@ class Ratings (Base):
 
 class Pictures (Base):
     __tablename__ = "pictures"
-    id = Column('id', Integer, primary_key = True)
-    owner_id = Column('owner_id', Integer, ForeignKey('users.id'))
-    rating_id = Column('rating_id', Integer, ForeignKey('ratings.id'))
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, unique=True, nullable=False)
+    owner_id = Column('owner_id', UUID(as_uuid=True), ForeignKey('users.id'))
+    rating_id = Column('rating_id', UUID(as_uuid=True), ForeignKey('ratings.id'))
     pictureUrl = Column('pictureURL', String)
-    created_at = Column('created_at', String)
+    created_at = Column('created_at', DateTime, default=func.now())
 
     user = relationship('Users', back_populates='pictures')
     rating = relationship('Ratings', back_populates='pictures')
 
-# Many to many relationship between restaurants and restaurant lists
-restaurant_association = Table(
-    'restaurant_list_association',
-    Base.metadata,
-    Column('restaurant_id', Integer, ForeignKey('restaurants.id'), primary_key=True),
-    Column('restaurant_list_id', Integer, ForeignKey('restaurant_lists.id'), primary_key=True)
-)
-
-# Many to many relationship between restaurants and tags
-tag_association = Table('tag_association', Base.metadata,
-    Column('restaurant_id', Integer, ForeignKey('restaurants.id')),
-    Column('tag_id', Integer, ForeignKey('tags.id'))
-)
-
-
 class Restaurants (Base):
     __tablename__ = "restaurants"
-    id = Column('id', Integer, primary_key = True)
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, unique=True, nullable=False)
     name = Column('name', String)
-    #list_id = Column('list_id', Integer, ForeignKey('restaurant_lists.id'))
+    #list_id = Column('list_id', UUID(as_uuid=True), ForeignKey('restaurant_lists.id'))
 
     ratings = relationship('Ratings', back_populates='restaurant')
     lists = relationship( 
@@ -75,22 +88,30 @@ class Restaurants (Base):
 
 class RestaurantLists (Base):
     __tablename__ = "restaurant_lists"
-    id = Column('id', Integer, primary_key = True)
-    owner_id = Column('owner_id', Integer, ForeignKey('users.id'))
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, unique=True, nullable=False)
     name = Column('name', String)
     description = Column('description', String)
 
-    user = relationship('Users', back_populates='lists')
     restaurants = relationship(
         'Restaurants', 
         secondary=restaurant_association,
         back_populates='lists' 
     )
 
+    users = relationship(
+        'Users', 
+        secondary=list_user_association, 
+        back_populates='lists'
+    )
+
+    @property
+    def user_names(self):
+        return [user.name for user in self.users]
+
 class Tags(Base):
     __tablename__ = "tags"
     
-    id = Column('id', Integer, primary_key=True)
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, unique=True, nullable=False)
     name = Column('name', String)
     
     restaurants = relationship(
@@ -98,4 +119,8 @@ class Tags(Base):
         secondary=tag_association,
         back_populates='tags'
     )
+
+    @property
+    def restaurant_names(self):
+        return [restaurant.name for restaurant in self.restaurants]
 

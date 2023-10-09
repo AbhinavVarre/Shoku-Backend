@@ -7,6 +7,8 @@ from urllib.parse import quote
 from . import models
 from .database import get_db
 from sqlalchemy.orm import Session
+import datetime
+import base64
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 allowed_mimes = {'image/png', 
@@ -19,15 +21,18 @@ def hash(password: str):
 def verify(plain_password, hashed_password):
     return pwd_context.verify(plain_password, hashed_password)
 
+def get_date():
+    return datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")
+
 load_dotenv()
 S3_BUCKET_NAME = os.getenv("S3_BUCKET_NAME")
 S3_ACCESS_KEY = os.getenv("S3_ACCESS_KEY")
 S3_SECRET_KEY = os.getenv("S3_SECRET_KEY")
 S3_REGION = os.getenv("S3_REGION")
 
-async def create_picture(rating_id: int, owner_id: int, current_date: str, picture: UploadFile = File(None), db: Session = Depends(get_db) ):
+async def create_picture(rating_id: int, owner_id: int, picture: UploadFile = File(None), db: Session = Depends(get_db) ):
     pictureUrl = await upload_file_to_s3(picture)
-    db_picture = models.Pictures(rating_id = rating_id, owner_id=owner_id, pictureUrl=pictureUrl, created_at=current_date)
+    db_picture = models.Pictures(rating_id = rating_id, owner_id=owner_id, pictureUrl=pictureUrl)
     db.add(db_picture)
     db.commit()
     db.refresh(db_picture)
@@ -54,7 +59,7 @@ async def upload_file_to_s3 (file: UploadFile):
         aws_access_key_id=S3_ACCESS_KEY,
         aws_secret_access_key=S3_SECRET_KEY
     )
-    s3_client.upload_fileobj(file.file, S3_BUCKET_NAME, file.filename)
+    s3_client.upload_fileobj(file.file, S3_BUCKET_NAME, file.filename, ExtraArgs={'ContentDisposition':'attachment'})
     file_key = quote(file.filename, safe='') # type: ignore
     url = f"https://{S3_BUCKET_NAME}.s3.{S3_REGION}.amazonaws.com/{file_key}"
     return url 
