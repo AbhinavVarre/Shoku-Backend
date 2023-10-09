@@ -22,10 +22,10 @@ def create_list(list: schemas.RestaurantListCreate, user: models.Users = Depends
     return db_restaurant_list
 
 #share list with another user
-@router.post("/{list_name}/share/{user_id}", response_model=schemas.RestaurantList, summary="Share list with another user")
-def share_list(list_name: str, user_id:UUID, current_user: models.Users = Depends(oauth2.get_current_user), db: Session = Depends(get_db)):
+@router.post("/{list_name}/share/{user}", response_model=schemas.RestaurantList, summary="Share list with another user")
+def share_list(list_name: str, user:str, current_user: models.Users = Depends(oauth2.get_current_user), db: Session = Depends(get_db)):
     list = read_list(db=db, list_name=list_name, current_user=current_user)
-    user = crud.get_user_by_id(db, id=user_id)
+    user = crud.get_user(db, name=user)
     list.users.append(user)
     db.add(list)
     db.commit()

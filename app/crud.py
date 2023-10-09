@@ -1,6 +1,6 @@
 from fastapi import HTTPException, UploadFile
 from sqlalchemy.orm import Session
-from . import models, schemas, utils
+from . import models, schemas, utils, crud
 import datetime
 from uuid import UUID
 
@@ -21,10 +21,11 @@ def get_user_by_id(db: Session, id: UUID) -> models.Users:
 
 
 # read ratings by restaurant
-def get_ratings(db: Session, restaurant_id: UUID):
+def get_ratings(db: Session, restaurant: str):
+    restaurant = crud.read_restaurant(db, name=restaurant)
     ratings = (
         db.query(models.Ratings)
-        .filter(models.Ratings.restaurant_id == restaurant_id)
+        .filter(models.Ratings.restaurant_id == restaurant.id)
         .all()
     )
     return ratings

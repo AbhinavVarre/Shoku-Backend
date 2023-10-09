@@ -52,18 +52,18 @@ async def create_rating_for_user(
     return db_item
 
 #read ratings by restaurant
-@router.get("/{restaurant_id}/read", response_model=list[schemas.Rating], summary="Read ratings by restaurant")
-def read_ratings(restaurant_id: UUID, db: Session = Depends(get_db)):
-    items = crud.get_ratings(db, restaurant_id=restaurant_id)
+@router.get("/{restaurant}/read", response_model=list[schemas.Rating], summary="Read ratings by restaurant")
+def read_ratings(restaurant: str, db: Session = Depends(get_db)):
+    items = crud.get_ratings(db, restaurant=restaurant)
     return items
 
 #read ratings by user
-@router.get("/{user_id}/ratings/", response_model=list[schemas.Rating], summary="Read ratings by user")
-def read_user_ratings(user_id: UUID, db: Session = Depends(get_db)):
+@router.get("/{user}/ratings/", response_model=list[schemas.Rating], summary="Read ratings by user")
+def read_user_ratings(user: str, db: Session = Depends(get_db)):
     """
     Returns the average rating for a restaurant. If there are no raings, returns 0.
     """
-    db_user = crud.get_user_by_id(db, id=user_id)
+    db_user = crud.get_user(db, name=user)
     if db_user is None:
         raise HTTPException(status_code=404, detail="User not found")
     return db_user.ratings
