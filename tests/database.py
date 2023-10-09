@@ -29,10 +29,10 @@ alembic_cfg = Config("alembic.ini")
 
 @pytest.fixture()
 def session():
-    #Base.metadata.drop_all(bind=engine)
-    #Base.metadata.create_all(bind=engine)
-    command.downgrade(alembic_cfg, "base")
-    command.upgrade(alembic_cfg, "head")
+    Base.metadata.drop_all(bind=engine)
+    Base.metadata.create_all(bind=engine)
+    #command.downgrade(alembic_cfg, "base")
+    #command.upgrade(alembic_cfg, "head")
     db = None
     try:
         db = TestingSessionLocal()

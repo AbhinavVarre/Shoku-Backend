@@ -3,6 +3,7 @@ from app import schemas, models, crud, oauth2
 from app.database import get_db
 from sqlalchemy.orm import Session
 from .. import utils
+from uuid import UUID
 
 
 router = APIRouter(
@@ -21,10 +22,10 @@ def create_list(list: schemas.RestaurantListCreate, user: models.Users = Depends
     return db_restaurant_list
 
 #share list with another user
-@router.post("/{list_name}/share/{user_id}", response_model=schemas.RestaurantList, summary="Share list with another user")
-def share_list(list_name: str, user_id:int, current_user: models.Users = Depends(oauth2.get_current_user), db: Session = Depends(get_db)):
+@router.post("/{list_name}/share/{user}", response_model=schemas.RestaurantList, summary="Share list with another user")
+def share_list(list_name: str, user:str, current_user: models.Users = Depends(oauth2.get_current_user), db: Session = Depends(get_db)):
     list = read_list(db=db, list_name=list_name, current_user=current_user)
-    user = crud.get_user_by_id(db, id=user_id)
+    user = crud.get_user(db, name=user)
     list.users.append(user)
     db.add(list)
     db.commit()
@@ -49,7 +50,7 @@ def read_all_lists(current_user: models.Users = Depends(oauth2.get_current_user)
     return crud.get_user(db, name=current_user.name).lists # type: ignore
 
 #read a user's list
-@router.get("read/{list_name}", response_model=schemas.RestaurantList, summary="Read a user's list")
+@router.get("/read/{list_name}", response_model=schemas.RestaurantList, summary="Read a user's list")
 def read_list(list_name: str, current_user: models.Users = Depends(oauth2.get_current_user), db: Session = Depends(get_db)):
     lists = read_all_lists(db=db, current_user=current_user)
     restaurant_list = next((lst for lst in lists if lst.name == list_name), None)
