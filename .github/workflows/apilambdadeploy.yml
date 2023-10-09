@@ -20,7 +20,7 @@ jobs:
 
       - name: Install Python Virtual ENV and pipenv
         run: |
-          pip3 install --upgrade pip3
+          pip3 install --upgrade pip
           pip3 install --upgrade pipenv wheel
           pip3 install virtualenv
 
