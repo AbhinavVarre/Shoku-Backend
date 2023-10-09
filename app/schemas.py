@@ -15,11 +15,10 @@ class TokenData(BaseModel):
 
 class RatingBase(BaseModel):
     score: int
-    restaurant_id: UUID
     review: str | None = None
 
 class RatingCreate(RatingBase):
-    pass
+    restaurant_name: str
 
 class PictureBase(BaseModel):
     pictureUrl: str
