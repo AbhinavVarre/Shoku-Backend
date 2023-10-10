@@ -27,6 +27,13 @@ list_user_association = Table(
     Column('list_id', UUID(as_uuid=True), ForeignKey('restaurant_lists.id'), primary_key=True)
 )
 
+# Association Table
+followers_association = Table(
+    'followers', Base.metadata,
+    Column('follower_id', UUID(as_uuid=True), ForeignKey('users.id')),
+    Column('followed_id', UUID(as_uuid=True), ForeignKey('users.id'))
+)
+
 class Users (Base):
     __tablename__ = "users"
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, unique=True, nullable=False)
@@ -41,6 +48,15 @@ class Users (Base):
         secondary=list_user_association, 
         back_populates='users'
     )
+
+    followed = relationship(
+    'Users',
+    secondary=followers_association,
+    primaryjoin=(followers_association.c.follower_id == id),
+    secondaryjoin=(followers_association.c.followed_id == id),
+    backref=backref('followers', lazy='dynamic'),
+    lazy='dynamic'
+)
 
 class Ratings (Base):
     __tablename__ = "ratings"
