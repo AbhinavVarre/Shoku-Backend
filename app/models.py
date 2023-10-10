@@ -66,6 +66,7 @@ class Pictures (Base):
 
     user = relationship('Users', back_populates='pictures')
     rating = relationship('Ratings', back_populates='pictures')
+    restaurant_list = relationship('RestaurantLists', back_populates='cover_picture')
 
 class Restaurants (Base):
     __tablename__ = "restaurants"
@@ -91,6 +92,9 @@ class RestaurantLists (Base):
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, unique=True, nullable=False)
     name = Column('name', String)
     description = Column('description', String)
+    cover_picture_id = Column('cover_picture_id', UUID(as_uuid=True), ForeignKey('pictures.id'))
+
+    cover_picture = relationship('Pictures', back_populates='restaurant_list')
 
     restaurants = relationship(
         'Restaurants', 

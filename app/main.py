@@ -45,12 +45,13 @@ stage = os.getenv('STAGE')
 openapi_prefix = "/" if stage == 'local' else "/dev"
 
 def custom_generate_unique_id(route: APIRoute):
+    print(route.name)
     return f"{route.tags[0]}-{route.name}"
 
 app = FastAPI(openapi_tags=tags_metadata, root_path=openapi_prefix, generate_unique_id_function=custom_generate_unique_id) 
 
 # Default Return
-@app.get("/")
+@app.get("/", tags=["root"])
 def read_root():
     return "Welcome to the Shoku Dev API!"
 

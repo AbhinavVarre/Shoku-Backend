@@ -31,9 +31,7 @@ async def create_rating_for_user(
         item = schemas.RatingCreate(**item_data)
     except (json.JSONDecodeError, ValidationError):
         raise HTTPException(status_code=400, detail="Invalid item data")
-    #items_dict = item.model_dump()
-    #items_dict["restaurant_id"] = crud.read_restaurant(db, name=item.restaurant).id
-    #del items_dict["restaurant"]
+
     db_item = models.Ratings(
         **item.model_dump(exclude={"restaurant_name"}), 
         owner_id=owner.id,

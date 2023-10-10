@@ -31,7 +31,7 @@ class Picture(PictureBase):
     
     id: UUID
     owner_id: UUID
-    rating_id: UUID
+    rating_id: UUID | None = None
     created_at: datetime | None = None
 
 class Rating(RatingBase):
@@ -84,6 +84,7 @@ class RestaurantList(RestaurantListBase):
     id: UUID
     restaurants: list[Restaurant] = []
     user_names: list[str] = []
+    cover_picture: Picture | None = None
 
 class UserBase(BaseModel):
     name: str
