@@ -1,5 +1,6 @@
 from fastapi import Depends, FastAPI, HTTPException, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.routing import APIRoute
 from sqlalchemy.orm import Session
 from mangum import Mangum
 from dotenv import load_dotenv
@@ -43,7 +44,10 @@ load_dotenv()
 stage = os.getenv('STAGE')
 openapi_prefix = "/" if stage == 'local' else "/dev"
 
-app = FastAPI(openapi_tags=tags_metadata, root_path=openapi_prefix) 
+def custom_generate_unique_id(route: APIRoute):
+    return f"{route.tags[0]}-{route.name}"
+
+app = FastAPI(openapi_tags=tags_metadata, root_path=openapi_prefix, generate_unique_id_function=custom_generate_unique_id) 
 
 # Default Return
 @app.get("/")
