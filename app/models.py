@@ -109,6 +109,7 @@ class RestaurantLists (Base):
     name = Column('name', String)
     description = Column('description', String)
     cover_picture_id = Column('cover_picture_id', UUID(as_uuid=True), ForeignKey('pictures.id'))
+    created_at = Column('created_at', DateTime, default=func.now())
 
     cover_picture = relationship('Pictures', back_populates='restaurant_list')
 
