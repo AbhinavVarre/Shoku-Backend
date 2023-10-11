@@ -39,6 +39,7 @@ class Users (Base):
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, unique=True, nullable=False)
     name = Column('name', String)
     password = Column('password', String)
+    created_at = Column('created_at', DateTime, default=func.now())
 
     ratings = relationship('Ratings', back_populates='user')
     pictures = relationship('Pictures', back_populates='user')
@@ -88,6 +89,7 @@ class Restaurants (Base):
     __tablename__ = "restaurants"
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, unique=True, nullable=False)
     name = Column('name', String)
+    created_at = Column('created_at', DateTime, default=func.now())
     #list_id = Column('list_id', UUID(as_uuid=True), ForeignKey('restaurant_lists.id'))
 
     ratings = relationship('Ratings', back_populates='restaurant')
@@ -134,6 +136,7 @@ class Tags(Base):
     
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, unique=True, nullable=False)
     name = Column('name', String)
+    created_at = Column('created_at', DateTime, default=func.now())
     
     restaurants = relationship(
         'Restaurants', 
