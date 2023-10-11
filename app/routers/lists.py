@@ -1,9 +1,11 @@
-from fastapi import Depends, FastAPI, HTTPException, APIRouter
+from fastapi import Depends, FastAPI, HTTPException, APIRouter, UploadFile, File, Form
 from app import schemas, models, crud, oauth2
 from app.database import get_db
 from sqlalchemy.orm import Session
 from .. import utils
 from uuid import UUID
+import json
+from pydantic import ValidationError
 
 
 router = APIRouter(
@@ -13,10 +15,35 @@ router = APIRouter(
 
 
 #create a list for a user
-@router.post("/add", response_model=schemas.RestaurantList, summary="Create a list for a user")
-def create_list(list: schemas.RestaurantListCreate, user: models.Users = Depends(oauth2.get_current_user), db: Session = Depends(get_db)):
-    db_restaurant_list = models.RestaurantLists( **list.model_dump(), users=[user])
+@router.post("/lists", response_model=schemas.RestaurantList, summary="Create a list for a user")
+async def create_list(
+    list_json: str = Form(...),  # Expect the data as a stringified JSON, 
+    user: models.Users = Depends(oauth2.get_current_user), 
+    db: Session = Depends(get_db), 
+    picture: UploadFile = File(None)
+):
+    """
+    input a json containing the following fields: name, and description {\"name\": \"places\", \"description\": \"fire places\"}
+    """
+    try:
+        # Convert the stringified JSON to a dict
+        list_data = json.loads(list_json)
+        # Convert the dict to the desired Pydantic model
+        list = schemas.RestaurantListCreate(**list_data)
+    except (json.JSONDecodeError, ValidationError):
+        raise HTTPException(status_code=400, detail="Invalid item data")
+    
+    db_restaurant_list = models.RestaurantLists(**list.model_dump(), users=[user])
     db.add(db_restaurant_list)
+
+    if picture:
+        db_picture = await utils.create_picture(
+            picture=picture,
+            owner_id=user.id,  # type: ignore
+            db=db,
+        )
+        db_restaurant_list.cover_picture = db_picture
+
     db.commit()
     db.refresh(db_restaurant_list)
     return db_restaurant_list
@@ -57,3 +84,24 @@ def read_list(list_name: str, current_user: models.Users = Depends(oauth2.get_cu
     if restaurant_list is None:
         raise HTTPException(status_code=404, detail=f"List not found for user {current_user.name}")
     return restaurant_list
+
+#create/update list cover photo
+@router.post("/{list_name}/picture/", response_model=schemas.RestaurantList, summary="create/update list cover photo")
+async def update_picture(list_name: str, 
+    user: models.Users = Depends(oauth2.get_current_user), 
+    db: Session = Depends(get_db),
+    picture: UploadFile = File(None)
+):
+    list = read_list(db=db, list_name=list_name, current_user=user)
+
+    db_picture = await utils.create_picture(
+        rating_id=None,
+        picture=picture,
+        owner_id=user.id,  # type: ignore
+        db=db,
+    )
+    list.cover_picture = db_picture
+    db.add(list)
+    db.commit()
+    db.refresh(list)
+    return list
