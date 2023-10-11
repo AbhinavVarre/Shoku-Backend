@@ -15,7 +15,7 @@ router = APIRouter(
 
 
 #create a list for a user
-@router.post("/lists", response_model=schemas.RestaurantList, summary="Create a list for a user")
+@router.post("/add", response_model=schemas.RestaurantList, summary="Create a list for a user")
 async def create_list(
     list_json: str = Form(...),  # Expect the data as a stringified JSON, 
     user: models.Users = Depends(oauth2.get_current_user), 
