@@ -46,7 +46,6 @@ openapi_prefix = "/" if stage == "local" else "/dev"
 
 
 def custom_generate_unique_id(route: APIRoute):
-    print(route.name)
     return f"{route.tags[0]}-{route.name}"
 
 

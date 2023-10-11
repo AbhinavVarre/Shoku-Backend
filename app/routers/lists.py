@@ -69,6 +69,35 @@ def share_list(
     return list
 
 
+# remove a user from list
+@router.post(
+    "/{list_name}/remove/{user}",
+    response_model=schemas.RestaurantList,
+    summary="Remove a user from list",
+)
+def remove_user(
+    list_name: str,
+    user: str,
+    current_user: models.Users = Depends(oauth2.get_current_user),
+    db: Session = Depends(get_db),
+):
+    """
+    To remove yourself from a list, enter your own username
+    """
+    list = read_list(db=db, list_name=list_name, current_user=current_user)
+    owner = list.users[0].name
+    if owner == user and current_user.name != owner:
+        raise HTTPException(
+            status_code=400, detail=f"Cannot remove owner {owner} from list {list_name}"
+        )
+    user = crud.get_user(db, name=user)
+    list.users.remove(user)
+    db.add(list)
+    db.commit()
+    db.refresh(list)
+    return list
+
+
 # add a restaurant to a user's list
 @router.post(
     "/{list_name}/add/{restaurant_name}",
