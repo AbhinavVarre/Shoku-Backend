@@ -19,8 +19,8 @@ sys.path.append(BASE_DIR)
 config = context.config
 
 
-#set up database connection
-SQLALCHEMY_TEST_URL = SQLALCHEMY_DATABASE_URL+"_test"
+# set up database connection
+SQLALCHEMY_TEST_URL = SQLALCHEMY_DATABASE_URL + "_test"
 config.set_main_option("sqlalchemy.url", SQLALCHEMY_DATABASE_URL)
 
 # Interpret the config file for Python logging.
@@ -78,9 +78,7 @@ def run_migrations_online() -> None:
     )
 
     with connectable.connect() as connection:
-        context.configure(
-            connection=connection, target_metadata=target_metadata
-        )
+        context.configure(connection=connection, target_metadata=target_metadata)
 
         with context.begin_transaction():
             context.run_migrations()

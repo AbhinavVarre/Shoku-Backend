@@ -16,11 +16,12 @@ black = ">=23.7.0"
 pipenv = ">=2023.8.26"
 httpx = ">=0.24.1"
 python-multipart = "*"
-python-jose = {extras = ["cryptography"], version = "*"}
-passlib = {extras = ["bcrypt"], version = "*"}
+python-jose = {extras = ["cryptography"] }
+passlib = {extras = ["bcrypt"] }
 boto3 = "*"
 exceptiongroup = "*"
 mangum = "*"
+pre-commit = "*"
 
 [dev-packages]
 pytest = ">=7.4.0"

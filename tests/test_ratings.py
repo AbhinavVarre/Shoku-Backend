@@ -12,6 +12,7 @@ from .database import client, session
 from uuid import uuid4
 import json
 
+
 def test_create_rating(client, session):
     # Create a user
     user_name = f"test_user_{uuid4()}"
@@ -23,11 +24,7 @@ def test_create_rating(client, session):
 
     # Log in as the user and retrieve the access token
     response = client.post(
-        "/login",
-        data={
-            "username": user_name,
-            "password": "test_password"
-        }
+        "/login", data={"username": user_name, "password": "test_password"}
     )
     assert response.status_code == 200, response.text
     access_token = response.json()["access_token"]
@@ -48,16 +45,16 @@ def test_create_rating(client, session):
     response = client.post(
         "/ratings/new",
         data={
-            "item_json": json.dumps(schemas.RatingCreate(
-                restaurant_name=restaurant_name,
-                score=4,
-                review="test_comment"
-            ).model_dump())
+            "item_json": json.dumps(
+                schemas.RatingCreate(
+                    restaurant_name=restaurant_name, score=4, review="test_comment"
+                ).model_dump()
+            )
         },
         headers={
             "Content-Type": "application/x-www-form-urlencoded",
-            "Authorization": f"Bearer {access_token}"
-        }
+            "Authorization": f"Bearer {access_token}",
+        },
     )
     assert response.status_code == 200, response.text
     data = response.json()
