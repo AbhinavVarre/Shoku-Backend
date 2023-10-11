@@ -29,7 +29,7 @@ list_user_association = Table(
 
 # Association Table
 followers_association = Table(
-    'followers', Base.metadata,
+    'followers_association', Base.metadata,
     Column('follower_id', UUID(as_uuid=True), ForeignKey('users.id')),
     Column('followed_id', UUID(as_uuid=True), ForeignKey('users.id'))
 )
@@ -56,7 +56,7 @@ class Users (Base):
     secondaryjoin=(followers_association.c.followed_id == id),
     backref=backref('followers', lazy='dynamic'),
     lazy='dynamic'
-)
+    )
 
 class Ratings (Base):
     __tablename__ = "ratings"
