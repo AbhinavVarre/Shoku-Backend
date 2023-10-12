@@ -4,6 +4,7 @@ from . import models, schemas, utils, crud
 import datetime
 from uuid import UUID
 
+
 # read user data by name
 def get_user(db: Session, name: str) -> models.Users:
     user = db.query(models.Users).filter(models.Users.name == name).first()
@@ -29,6 +30,7 @@ def get_ratings(db: Session, restaurant: str):
         .all()
     )
     return ratings
+
 
 # read restaurant data by name
 def read_restaurant(db: Session, name: str):

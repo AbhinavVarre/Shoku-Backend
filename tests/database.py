@@ -14,11 +14,11 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-host     = os.getenv('HOST')
-user     = os.getenv('DBUSER')
-password = os.getenv('PASSWORD')
-database = os.getenv('DATABASE')
-port     = os.getenv('PORT')
+host = os.getenv("HOST")
+user = os.getenv("DBUSER")
+password = os.getenv("PASSWORD")
+database = os.getenv("DATABASE")
+port = os.getenv("PORT")
 
 SQLALCHEMY_TEST_URL = f"postgresql://{user}:{password}@{host}:{port}/{database}_test"
 
@@ -27,12 +27,13 @@ TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engin
 
 alembic_cfg = Config("alembic.ini")
 
+
 @pytest.fixture()
 def session():
     Base.metadata.drop_all(bind=engine)
     Base.metadata.create_all(bind=engine)
-    #command.downgrade(alembic_cfg, "base")
-    #command.upgrade(alembic_cfg, "head")
+    # command.downgrade(alembic_cfg, "base")
+    # command.upgrade(alembic_cfg, "head")
     db = None
     try:
         db = TestingSessionLocal()
@@ -41,6 +42,7 @@ def session():
         if db:
             db.close()
 
+
 @pytest.fixture
 def client(session):
     def override_get_db():
@@ -48,5 +50,6 @@ def client(session):
             yield session
         finally:
             session.close()
+
     app.dependency_overrides[get_db] = override_get_db
     yield TestClient(app)
