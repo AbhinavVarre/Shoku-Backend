@@ -26,7 +26,7 @@ def test_following(client, session):
     # create restaurant
     restaurant = schemas.RestaurantCreate(name="restaurant1")
     response = client.post(
-        "/restaurants/add",
+        "/restaurants/",
         json=restaurant.model_dump(),
         headers={"Authorization": f"Bearer {token}"},
     )

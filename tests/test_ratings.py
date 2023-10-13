@@ -32,7 +32,7 @@ def test_create_rating(client, session):
     # Create a restaurant
     restaurant_name = f"test_restaurant_{uuid4()}"
     response = client.post(
-        "/restaurants/add",
+        "/restaurants/",
         json=schemas.RestaurantCreate(name=restaurant_name).model_dump(),
     )
     assert response.status_code == 200, response.text

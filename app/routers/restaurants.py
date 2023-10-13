@@ -3,13 +3,13 @@ from app import schemas, models, crud
 from app.database import get_db
 from sqlalchemy.orm import Session
 from uuid import UUID
-
+from typing import Optional
 
 router = APIRouter(prefix="/restaurants", tags=["restaurants"])
 
 
-# create a restaurant
-@router.post("/add", response_model=schemas.Restaurant, summary="Create a restaurant")
+# Create a restaurant
+@router.post("/", response_model=schemas.Restaurant, summary="Create a restaurant")
 def create_restaurant(
     restaurant: schemas.RestaurantCreate, db: Session = Depends(get_db)
 ):
@@ -20,7 +20,7 @@ def create_restaurant(
     return db_restaurant
 
 
-# read all restaurants
+# Read all restaurants
 @router.get(
     "/", response_model=list[schemas.Restaurant], summary="Read all restaurants"
 )
@@ -29,29 +29,26 @@ def read_restaurants(skip: int = 0, limit: int = 100, db: Session = Depends(get_
     return restaurants
 
 
-# read restaurant data by name
+# Combine by-id and by-name into one route and use query parameters to differentiate
 @router.get(
-    "/name/{name}",
+    "/search",
     response_model=schemas.Restaurant,
-    summary="Read restaurant data by name",
+    summary="Search for a restaurant by name or id",
 )
-def read_restaurant(name: str, db: Session = Depends(get_db)):
-    db_restaurant = crud.read_restaurant(db, name=name)
-    return db_restaurant
+def search_restaurant(
+    name: Optional[str] = None, id: Optional[UUID] = None, db: Session = Depends(get_db)
+):
+    if name:
+        return crud.read_restaurant(db, name=name)
+    elif id:
+        return crud.read_restaurant_by_id(db, id=id)
+    else:
+        raise HTTPException(status_code=400, detail="Invalid query parameters")
 
 
-# read restaurant data by id
+# Read ratings by restaurant name
 @router.get(
-    "/id/{id}", response_model=schemas.Restaurant, summary="Read restaurant data by id"
-)
-def read_restaurant_by_id(id: UUID, db: Session = Depends(get_db)):
-    db_restaurant = crud.read_restaurant_by_id(db, id=id)
-    return db_restaurant
-
-
-# read ratings by restaurant name
-@router.get(
-    "/ratings/name/{name}",
+    "/{name}/ratings",
     response_model=list[schemas.Rating],
     summary="Read ratings by restaurant name",
 )
@@ -60,7 +57,7 @@ def read_restaurant_ratings(name: str, db: Session = Depends(get_db)):
     return restaurant.ratings
 
 
-# get restaurant average rating
+# Get restaurant average rating
 @router.get(
     "/{name}/score", response_model=float, summary="Get restaurant average rating"
 )

@@ -8,7 +8,7 @@ import json
 from pydantic import ValidationError
 
 
-router = APIRouter(prefix="/restaurantlist", tags=["lists"])
+router = APIRouter(prefix="/lists", tags=["lists"])
 
 
 # create a list for a user
