@@ -17,7 +17,7 @@ def test_create_rating(client, session):
     # Create a user
     user_name = f"test_user_{uuid4()}"
     response = client.post(
-        "/users/add",
+        "/users/",
         json=schemas.UserCreate(name=user_name, password="test_password").model_dump(),
     )
     assert response.status_code == 200, response.text

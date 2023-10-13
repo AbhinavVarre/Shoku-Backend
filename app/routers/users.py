@@ -3,6 +3,7 @@ from app import schemas, models, crud, oauth2
 from app.database import get_db
 from sqlalchemy.orm import Session
 from uuid import UUID
+from typing import Optional
 from .. import utils
 
 router = APIRouter(prefix="/users", tags=["users"])
@@ -27,20 +28,21 @@ def read_users(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     return users
 
 
-# Read user by name
-@router.get("/{name}", response_model=schemas.User, summary="Read user data by name")
-def read_user(name: str, db: Session = Depends(get_db)):
-    db_user = crud.get_user(db=db, name=name)
-    return db_user
-
-
-# Read user by id
+# Search user by name or id
 @router.get(
-    "/{user_id}/details", response_model=schemas.User, summary="Read user data by id"
+    "/search", response_model=schemas.User, summary="Search for a user by name or id"
 )
-def read_user_by_id(user_id: UUID, db: Session = Depends(get_db)):
-    db_user = crud.get_user_by_id(db, id=user_id)
-    return db_user
+def search_user(
+    name: Optional[str] = None,
+    user_id: Optional[UUID] = None,
+    db: Session = Depends(get_db),
+):
+    if name:
+        return crud.get_user(db=db, name=name)
+    elif user_id:
+        return crud.get_user_by_id(db, id=user_id)
+    else:
+        raise HTTPException(status_code=400, detail="Invalid query parameters")
 
 
 # Follow another user
