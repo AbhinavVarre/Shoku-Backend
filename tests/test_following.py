@@ -13,7 +13,7 @@ def test_following(client, session):
     # Create first user
     user1_name = f"test_user_{uuid4()}"
     response = client.post(
-        "/users/add",
+        "/users/",
         json=schemas.UserCreate(name=user1_name, password="test_password").model_dump(),
     )
     assert response.status_code == 200, response.text
@@ -22,7 +22,7 @@ def test_following(client, session):
     # Create second user
     user2_name = f"test_user_{uuid4()}"
     response = client.post(
-        "/users/add",
+        "/users/",
         json=schemas.UserCreate(name=user2_name, password="test_password").model_dump(),
     )
     assert response.status_code == 200, response.text
@@ -37,7 +37,7 @@ def test_following(client, session):
     headers = {"Authorization": f"Bearer {access_token}"}
 
     # Follow second user
-    response = client.post(f"/users/follow/{user2_name}", headers=headers)
+    response = client.post(f"/users/{user2_name}/follow", headers=headers)
     assert response.status_code == 200, response.text
 
     # Check that first user's following list contains second user

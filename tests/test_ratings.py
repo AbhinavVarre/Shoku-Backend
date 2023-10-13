@@ -17,7 +17,7 @@ def test_create_rating(client, session):
     # Create a user
     user_name = f"test_user_{uuid4()}"
     response = client.post(
-        "/users/add",
+        "/users/",
         json=schemas.UserCreate(name=user_name, password="test_password").model_dump(),
     )
     assert response.status_code == 200, response.text
@@ -32,7 +32,7 @@ def test_create_rating(client, session):
     # Create a restaurant
     restaurant_name = f"test_restaurant_{uuid4()}"
     response = client.post(
-        "/restaurants/add",
+        "/restaurants/",
         json=schemas.RestaurantCreate(name=restaurant_name).model_dump(),
     )
     assert response.status_code == 200, response.text
@@ -43,7 +43,7 @@ def test_create_rating(client, session):
 
     # Submit a rating for the restaurant with the authorized access token
     response = client.post(
-        "/ratings/new",
+        "/ratings/",
         data={
             "item_json": json.dumps(
                 schemas.RatingCreate(

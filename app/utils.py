@@ -8,7 +8,7 @@ from . import models
 from .database import get_db
 from sqlalchemy.orm import Session
 import datetime
-import base64
+from uuid import UUID
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 allowed_mimes = {"image/png", "image/jpeg"}
@@ -34,8 +34,8 @@ S3_REGION = os.getenv("S3_REGION")
 
 
 async def create_picture(
-    owner_id: int,
-    rating_id: int | None = None,
+    owner_id: UUID,
+    rating_id: UUID | None = None,
     picture: UploadFile = File(None),
     db: Session = Depends(get_db),
 ):

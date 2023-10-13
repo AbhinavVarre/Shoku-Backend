@@ -4,7 +4,7 @@ from .database import client, session
 
 def test_create_user(client, session):
     response = client.post(
-        "/users/add",
+        "/users/",
         json={"name": "abhinav", "password": "chimichangas"},
     )
     assert response.status_code == 200, response.text
@@ -13,7 +13,10 @@ def test_create_user(client, session):
     assert data["name"] == "abhinav"
     user_name = data["name"]
 
-    response = client.get(f"/users/name/{user_name}")
+    response = client.get(
+        "/users/search",
+        params={"name": user_name},
+    )
     assert response.status_code == 200, response.text
     data = response.json()
     assert data["name"] == "abhinav"

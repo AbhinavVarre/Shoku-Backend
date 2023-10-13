@@ -10,11 +10,9 @@ from uuid import UUID
 router = APIRouter(prefix="/ratings", tags=["ratings"])
 
 
-# post a rating from a user for a restaurant
+# Post a rating from a user for a restaurant
 @router.post(
-    "/new",
-    response_model=schemas.Rating,
-    summary="Post a rating from a user for a restaurant",
+    "/", response_model=schemas.Rating, summary="Create a rating for a restaurant"
 )
 async def create_rating_for_user(
     item_json: str = Form(...),  # Expect the data as a stringified JSON,
@@ -23,7 +21,7 @@ async def create_rating_for_user(
     picture: UploadFile = File(None),
 ):
     """
-    input a json containing the following fields: score, restaurant, and optionally a review like {\"score\": 0, \"restaurant_name\": \"kims\", \"review\": \"pretty good\"}
+    Input a JSON containing the following fields: score, restaurant_name, and optionally a review. Example: {"score": 0, "restaurant_name": "kims", "review": "pretty good"}
     """
     try:
         # Convert the stringified JSON to a dict
@@ -55,9 +53,9 @@ async def create_rating_for_user(
     return db_item
 
 
-# read ratings by restaurant
+# Read ratings by restaurant
 @router.get(
-    "/{restaurant}/read",
+    "/restaurant/{restaurant}",
     response_model=list[schemas.Rating],
     summary="Read ratings by restaurant",
 )
@@ -66,15 +64,13 @@ def read_ratings(restaurant: str, db: Session = Depends(get_db)):
     return items
 
 
-# read ratings by user
+# Read ratings by user
 @router.get(
-    "/{user}/ratings/",
-    response_model=list[schemas.Rating],
-    summary="Read ratings by user",
+    "/user/{user}", response_model=list[schemas.Rating], summary="Read ratings by user"
 )
 def read_user_ratings(user: str, db: Session = Depends(get_db)):
     """
-    Returns the average rating for a restaurant. If there are no raings, returns 0.
+    Returns the ratings for a user.
     """
     db_user = crud.get_user(db, name=user)
     if db_user is None:

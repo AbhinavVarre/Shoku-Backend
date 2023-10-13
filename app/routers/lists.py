@@ -8,12 +8,12 @@ import json
 from pydantic import ValidationError
 
 
-router = APIRouter(prefix="/restaurantlist", tags=["lists"])
+router = APIRouter(prefix="/lists", tags=["lists"])
 
 
 # create a list for a user
 @router.post(
-    "/add", response_model=schemas.RestaurantList, summary="Create a list for a user"
+    "/", response_model=schemas.RestaurantList, summary="Create a list for a user"
 )
 async def create_list(
     list_json: str = Form(...),  # Expect the data as a stringified JSON,
@@ -70,8 +70,8 @@ def share_list(
 
 
 # remove a user from list
-@router.post(
-    "/{list_name}/remove/{user}",
+@router.delete(
+    "/{list_name}/users/{user}",
     response_model=schemas.RestaurantList,
     summary="Remove a user from list",
 )
@@ -100,7 +100,7 @@ def remove_user(
 
 # add a restaurant to a user's list
 @router.post(
-    "/{list_name}/add/{restaurant_name}",
+    "/{list_name}/restaurants/{restaurant_name}",
     response_model=schemas.RestaurantList,
     summary="Add a restaurant to a user's list",
 )
@@ -112,7 +112,38 @@ def add_to_list(
 ):
     list = read_list(db=db, list_name=list_name, current_user=current_user)
     restaurant = crud.read_restaurant(db, name=restaurant_name)
+
+    # Check if restaurant is already in the list
+    if any(rest.id == restaurant.id for rest in list.restaurants):
+        raise HTTPException(status_code=400, detail="Restaurant already in the list")
+
     list.restaurants.append(restaurant)
+    db.add(list)
+    db.commit()
+    db.refresh(list)
+    return list
+
+
+# remove a restaurant from a user's list
+@router.delete(
+    "/{list_name}/restaurants/{restaurant_name}",
+    response_model=schemas.RestaurantList,
+    summary="Remove a restaurant from a user's list",
+)
+def remove_from_list(
+    list_name: str,
+    restaurant_name: str,
+    current_user: models.Users = Depends(oauth2.get_current_user),
+    db: Session = Depends(get_db),
+):
+    list = read_list(db=db, list_name=list_name, current_user=current_user)
+    restaurant = crud.read_restaurant(db, name=restaurant_name)
+
+    # Check if restaurant is not in the list
+    if not any(rest.id == restaurant.id for rest in list.restaurants):
+        raise HTTPException(status_code=400, detail="Restaurant not found in the list")
+
+    list.restaurants.remove(restaurant)
     db.add(list)
     db.commit()
     db.refresh(list)
@@ -121,7 +152,7 @@ def add_to_list(
 
 # read all lists for a user
 @router.get(
-    "/all",
+    "/",
     response_model=list[schemas.RestaurantList],
     summary="Read all lists for a user",
 )
@@ -134,7 +165,7 @@ def read_all_lists(
 
 # read a user's list
 @router.get(
-    "/read/{list_name}",
+    "/{list_name}",
     response_model=schemas.RestaurantList,
     summary="Read a user's list",
 )
@@ -154,7 +185,7 @@ def read_list(
 
 # create/update list cover photo
 @router.post(
-    "/{list_name}/picture/",
+    "/{list_name}/picture",
     response_model=schemas.RestaurantList,
     summary="create/update list cover photo",
 )

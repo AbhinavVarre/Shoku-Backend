@@ -4,7 +4,6 @@ from app.database import get_db
 from sqlalchemy.orm import Session
 from fastapi.security.oauth2 import OAuth2PasswordRequestForm
 
-
 router = APIRouter(tags=["authentication"])
 
 
@@ -19,20 +18,14 @@ def login(
         .first()
     )
 
-    # no such username
-    if not user:
+    # No such username or wrong password
+    if not user or not utils.verify(user_credentials.password, user.password):
         raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN, detail=f"Invalid Credentials"
+            status_code=status.HTTP_403_FORBIDDEN, detail="Invalid Credentials"
         )
 
-    # wrong password
-    if not utils.verify(user_credentials.password, user.password):
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN, detail=f"Invalid Credentials"
-        )
-
-    # create and return token
-    # can add fields to payload if needed, update schemas.TokenData accordingly
+    # Create and return token. If there's a need to add more fields to the payload in the future,
+    # ensure that schemas.TokenData is updated accordingly.
     access_token = oauth2.create_access_token(data={"user_id": str(user.id)})
 
     return {"access_token": access_token, "token_type": "bearer"}

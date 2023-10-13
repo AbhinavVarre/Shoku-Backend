@@ -2,15 +2,15 @@ from fastapi import Depends, FastAPI, HTTPException, APIRouter
 from app import schemas, models, crud, oauth2
 from app.database import get_db
 from sqlalchemy.orm import Session
-from .. import utils
 from uuid import UUID
-
+from typing import Optional
+from .. import utils
 
 router = APIRouter(prefix="/users", tags=["users"])
 
 
-# add users
-@router.post("/add", response_model=schemas.User, summary="Add a user")
+# Create a user
+@router.post("/", response_model=schemas.User, summary="Add a user")
 def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
     hashed_password = utils.hash(user.password)
     user.password = hashed_password
@@ -21,34 +21,33 @@ def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
     return db_user
 
 
-# read all users
+# Read all users
 @router.get("/", response_model=list[schemas.User], summary="Read all users")
 def read_users(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     users = db.query(models.Users).offset(skip).limit(limit).all()
     return users
 
 
-# read user data by name
+# Search user by name or id
 @router.get(
-    "/name/{name}", response_model=schemas.User, summary="Read user data by name"
+    "/search", response_model=schemas.User, summary="Search for a user by name or id"
 )
-def read_user(name: str, db: Session = Depends(get_db)):
-    db_user = crud.get_user(db=db, name=name)
-    return db_user
+def search_user(
+    name: Optional[str] = None,
+    user_id: Optional[UUID] = None,
+    db: Session = Depends(get_db),
+):
+    if name:
+        return crud.get_user(db=db, name=name)
+    elif user_id:
+        return crud.get_user_by_id(db, id=user_id)
+    else:
+        raise HTTPException(status_code=400, detail="Invalid query parameters")
 
 
-# read user data by id
-@router.get(
-    "/id/{user_id}", response_model=schemas.User, summary="Read user data by id"
-)
-def read_user_by_id(user_id: UUID, db: Session = Depends(get_db)):
-    db_user = crud.get_user_by_id(db, id=user_id)
-    return db_user
-
-
-# follow another user
+# Follow another user
 @router.post(
-    "/follow/{user}", response_model=schemas.User, summary="Follow another user"
+    "/{user}/follow", response_model=schemas.User, summary="Follow another user"
 )
 def follow_user(
     user: str,
@@ -63,9 +62,9 @@ def follow_user(
     return current_user
 
 
-# unfollow another user
+# Unfollow another user
 @router.post(
-    "/unfollow/{user}", response_model=schemas.User, summary="Unfollow another user"
+    "/{user}/unfollow", response_model=schemas.User, summary="Unfollow another user"
 )
 def unfollow_user(
     user: str,
@@ -82,7 +81,7 @@ def unfollow_user(
     return current_user
 
 
-# get followers
+# Get followers
 @router.get("/followers", response_model=list[schemas.User], summary="Get followers")
 def get_followers(
     current_user: models.Users = Depends(oauth2.get_current_user),
@@ -91,7 +90,7 @@ def get_followers(
     return current_user.followers.all()
 
 
-# get following
+# Get following
 @router.get("/following", response_model=list[schemas.User], summary="Get following")
 def get_following(
     current_user: models.Users = Depends(oauth2.get_current_user),
