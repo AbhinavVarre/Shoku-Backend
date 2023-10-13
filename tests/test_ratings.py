@@ -43,7 +43,7 @@ def test_create_rating(client, session):
 
     # Submit a rating for the restaurant with the authorized access token
     response = client.post(
-        "/ratings/new",
+        "/ratings/",
         data={
             "item_json": json.dumps(
                 schemas.RatingCreate(
