@@ -39,7 +39,7 @@ def test_following(client, session):
         name="list1", description="description1"
     )
     response = client.post(
-        "/lists/add",
+        "/lists/",
         data={"list_json": json.dumps(restaurant_list.model_dump())},
         headers={"Authorization": f"Bearer {token}"},
     )
@@ -49,7 +49,7 @@ def test_following(client, session):
 
     # add restaurant to list
     response = client.post(
-        f"/lists/{list_name}/add/{restaurant.name}",
+        f"/lists/{list_name}/restaurants/{restaurant.name}",
         headers={"Authorization": f"Bearer {token}"},
     )
     assert response.status_code == 200
@@ -72,6 +72,6 @@ def test_following(client, session):
     token = response.json()["access_token"]
 
     # see if list appears
-    response = client.get("/lists/all", headers={"Authorization": f"Bearer {token}"})
+    response = client.get("/lists/", headers={"Authorization": f"Bearer {token}"})
     assert response.status_code == 200
     assert any(list["name"] == list_name for list in response.json())
