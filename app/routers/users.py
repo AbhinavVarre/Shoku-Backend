@@ -21,6 +21,19 @@ def create_user(user: schemas.UserCreate, db: Session = Depends(get_db)):
     return db_user
 
 
+# remove a user
+@router.delete(
+    "/{user_name}",
+    response_model=schemas.User,
+    summary="Delete a user by name",
+)
+def delete_user(user_name: str, db: Session = Depends(get_db)):
+    user = crud.get_user(db, name=user_name)
+    db.delete(user)
+    db.commit()
+    return user
+
+
 # Read all users
 @router.get("/", response_model=list[schemas.User], summary="Read all users")
 def read_users(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
