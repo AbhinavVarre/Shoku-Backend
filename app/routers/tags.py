@@ -49,6 +49,28 @@ def tag_restaurant(restaurant_name: str, tag_name: str, db: Session = Depends(ge
     return restaurant
 
 
+# untag a restaurant
+@router.delete(
+    "/{restaurant_name}/{tag_name}",
+    response_model=schemas.Restaurant,
+    summary="Untag a restaurant with a specific tag",
+)
+def untag_restaurant(
+    restaurant_name: str, tag_name: str, db: Session = Depends(get_db)
+):
+    restaurant = crud.read_restaurant(db, name=restaurant_name)
+    tag = read_tag(db=db, name=tag_name)
+    if tag not in restaurant.tags:
+        raise HTTPException(
+            status_code=400, detail="Restaurant not tagged with this tag"
+        )
+    restaurant.tags.remove(tag)
+    db.add(restaurant)
+    db.commit()
+    db.refresh(restaurant)
+    return restaurant
+
+
 # Read all restaurants associated with a tag
 @router.get(
     "/{tag_name}/restaurants",

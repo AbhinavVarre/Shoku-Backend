@@ -20,6 +20,26 @@ def create_restaurant(
     return db_restaurant
 
 
+# delete a restaurant by name  or id
+@router.delete(
+    "/",
+    response_model=schemas.Restaurant,
+    summary="Delete a restaurant by name",
+)
+def delete_restaurant(
+    name: Optional[str] = None, id: Optional[UUID] = None, db: Session = Depends(get_db)
+):
+    if name:
+        restaurant = crud.read_restaurant(db, name=name)
+    elif id:
+        restaurant = crud.read_restaurant_by_id(db, id=id)
+    else:
+        raise HTTPException(status_code=400, detail="Invalid query parameters")
+    db.delete(restaurant)
+    db.commit()
+    return restaurant
+
+
 # Read all restaurants
 @router.get(
     "/", response_model=list[schemas.Restaurant], summary="Read all restaurants"
