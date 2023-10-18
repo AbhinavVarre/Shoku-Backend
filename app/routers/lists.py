@@ -60,8 +60,7 @@ def delete_list(
     db: Session = Depends(get_db),
 ):
     list = read_list(db=db, list_name=list_name, current_user=user)
-    db.delete(list)
-    db.commit()
+    remove_user(list_name=list_name, user=user.name, db=db)  # type: ignore
     return list
 
 
