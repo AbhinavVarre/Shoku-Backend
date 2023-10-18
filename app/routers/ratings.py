@@ -67,6 +67,12 @@ def delete_rating(
     if db_rating is None:
         raise HTTPException(status_code=404, detail="Rating not found")
     db.delete(db_rating)
+    # delete associated pictures
+    pictures = (
+        db.query(models.Pictures).filter(models.Pictures.rating_id == rating_id).all()
+    )
+    for picture in pictures:
+        db.delete(picture)
     db.commit()
     return db_rating
 
