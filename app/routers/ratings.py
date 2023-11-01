@@ -53,6 +53,30 @@ async def create_rating_for_user(
     return db_item
 
 
+# delete a rating by id
+@router.delete(
+    "/{rating_id}",
+    response_model=schemas.Rating,
+    summary="Delete a rating by id",
+)
+def delete_rating(
+    rating_id: UUID,
+    db: Session = Depends(get_db),
+):
+    db_rating = db.query(models.Ratings).filter(models.Ratings.id == rating_id).first()
+    if db_rating is None:
+        raise HTTPException(status_code=404, detail="Rating not found")
+    db.delete(db_rating)
+    # delete associated pictures
+    pictures = (
+        db.query(models.Pictures).filter(models.Pictures.rating_id == rating_id).all()
+    )
+    for picture in pictures:
+        db.delete(picture)
+    db.commit()
+    return db_rating
+
+
 # Read ratings by restaurant
 @router.get(
     "/restaurant/{restaurant}",

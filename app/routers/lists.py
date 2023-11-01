@@ -48,6 +48,22 @@ async def create_list(
     return db_restaurant_list
 
 
+# delete a list for a user
+@router.delete(
+    "/{list_name}",
+    response_model=schemas.RestaurantList,
+    summary="Delete a list for a user",
+)
+def delete_list(
+    list_name: str,
+    user: models.Users = Depends(oauth2.get_current_user),
+    db: Session = Depends(get_db),
+):
+    list = read_list(db=db, list_name=list_name, current_user=user)
+    remove_user(list_name=list_name, user=user.name, db=db)  # type: ignore
+    return list
+
+
 # share list with another user
 @router.post(
     "/{list_name}/share/{user}",
